@@ -25,7 +25,6 @@ $(document).ready(function () {
         _apri.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
-        creaChart();
     });
 
     _info.on("click", function () {
@@ -47,8 +46,10 @@ $(document).ready(function () {
 
     //prendo dati dal db
 
-    let rq = inviaRichiesta("POST", "/api/dati")
+    let tipo = "temperatura";
+    let rq = inviaRichiesta("POST", "/api/prendidati",)
     rq.then(function (response) {
+        creaChart(response);
         console.log(response.data)
     })
     rq.catch(function (err) {
@@ -59,7 +60,9 @@ $(document).ready(function () {
             errore(err);
     })
 
-    function creaChart() {
+    function creaChart(response) {
+        let valoreTemperatura = response.data[0].valori;
+        console.log(valoreTemperatura);
         const ctx = $("#myChart")
 
         new Chart(ctx, {
@@ -68,7 +71,7 @@ $(document).ready(function () {
                 labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                 datasets: [{
                     label: 'Temperatura',
-                    data: [12, 19, 3, 5, 2, 3],
+                    data: valoreTemperatura,
                     borderWidth: 1
                 },
                 {
