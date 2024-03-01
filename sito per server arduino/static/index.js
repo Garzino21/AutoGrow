@@ -5,10 +5,10 @@ $(document).ready(function () {
     let _apri = $("#apri");
     let _paginaIniziale = $("#paginaIniziale");
     let _paginaDati = $("#paginaDati");
-    let _progetto=$("#progetto");
+    let _progetto = $("#progetto");
     let _info = $("#info");
     let _body = $("body");
-    let _indietro = $("#indietro"); 
+    let _indietro = $("#indietro");
 
 
     //impostazioni di avvio
@@ -18,13 +18,14 @@ $(document).ready(function () {
     _indietro.hide();
 
     //gestione eventi
-    _apri.on("click", function () {
+    _apri.on("click",function () {
         _paginaIniziale.hide();
         _paginaDati.show();
         _info.hide();
         _apri.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
+        creaChart();
     });
 
     _info.on("click", function () {
@@ -57,5 +58,35 @@ $(document).ready(function () {
         else
             errore(err);
     })
+
+    function creaChart() {
+        const ctx = $("#myChart")
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: 'Temperatura',
+                    data: [12, 19, 3, 5, 2, 3],
+                    borderWidth: 1
+                },
+                {
+                    label: 'Umidità',
+                    data: [14, 3, 33, 21, 11, 3],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 
 });

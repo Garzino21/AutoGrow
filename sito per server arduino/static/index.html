@@ -11,14 +11,15 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="./libreria.js"></script>
   <script src="./index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 
 
 <body>
-  <video muted autoplay loop class="videofullscreen">
+  <!--<video muted autoplay loop class="videofullscreen">
     <source src="img/forest2.mp4" type="video/mp4">
-  </video>
+  </video>-->
   
   <div id="indietro" class="button">⇦</div>
   <div class="container">
@@ -33,52 +34,30 @@
     </div>
 
     <div id="progetto" class="application" style="background-color: transparent; height: fit-content;">
+      <h2 style="color: rgb(144, 210, 126); font-weight: bold;">IL PROGETTO</h2>
+      <img src="img/background.png" alt="non trovato" class="textImage">
       <h2 style="color: rgb(144, 210, 126); font-weight: bold;">CHI SIAMO?</h2>
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta voluptate iste fuga tempora, saepe voluptatum!
-      Architecto, excepturi? Quo, saepe enim. Doloremque animi provident veritatis asperiores corporis laudantium sit
-      cum error.
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è un progetto nato con l'obiettivo di rendere l'arte della semina e della cura delle piante 
+      un'attività semplice e alla portata di tutti. Con <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span>, la semina e la cura delle piante non saranno più un'attività noiosa per il semplice fatto che
+      il processo di irrigazione e cura del terreno è totalmente automatizzato. Non vedrai l'ora di vedere crescere le tue piante!!
+      <br>
+      <br>
+      <h2 style="color: rgb(144, 210, 126); font-weight: bold;">COME FUNZIONA?</h2>
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> cerca di ottimizzare l'utilizzo delle risorse indispensabili per la fotosintesi quali acqua, luce e di rendere il processo di irrigazione il più efficiente possibile.
+      Il sistema è composto da una serie di sensori che monitorano costantemente il terreno. In base a queste informazioni, il sistema decide se e quanto irrigare.
+      Dal sito web, è possibile monitorare lo stato del terreno e delle piante, e modificare le impostazioni di irrigazione.
+      Attraverso dei semplici comandi, è possibile attivare o disattivare l'irrigazione automatica, passando così alla versione manuale.
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è stata progettata ad hoc per essere il più semplice possibile da utilizzare, in modo che tutti possano godere dei benefici di avere un giardino in casa.
+      Il suo design è stato pensato per essere il più compatto possibile, in modo da poter essere posizionato in qualsiasi ambiente.
+      <br>
+      <br>
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> nasce dall'esigenza di riuscire a anticipare la semina delle piante aromatiche, quali il basilico, il prezzemolo, la menta, il timo e la salvia, in modo da poterle avere a disposizione prima del periodo 
+      primaverile. Inoltre, il sistema è stato progettato per essere il più versatile possibile, in modo da poter essere utilizzato per qualsiasi tipo di pianta.
+
+
+
+
+
     </div>
 
     <div id="paginaDati" class="application">
@@ -91,8 +70,12 @@
       </div>
 
       <div id="parametri">
-        <div>param</div>
-        <div>param</div>
+        <div class="div">
+          <div id="contenitoreCanvas">
+            <canvas id="myChart"></canvas>
+          </div>
+        </div>
+        <div class="div">param</div>
       </div>
 
     </div>

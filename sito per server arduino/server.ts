@@ -90,7 +90,7 @@ app.use("/", _cors(corsOptions));
 app.post("/api/dati", async (req, res, next) => {
     const client = new MongoClient(connectionString);
     await client.connect();
-    let collection = client.db(DBNAME).collection("film");
+    let collection = client.db(DBNAME).collection("dati");
     let rq = collection.find({}).toArray();
     rq.then((data) => {
         if (!data) {
@@ -103,6 +103,23 @@ app.post("/api/dati", async (req, res, next) => {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 });
+
+//serve a aggiungere dati alla temperatura
+app.get("/api/inviadati", async (req, res, next) => {
+    let dato= req["query"].dato;
+    let tipo= req["query"].tipo;
+    console.log(dato);
+    console.log(tipo);
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("dati");
+    let rq = collection.updateOne({tipo: tipo},{$push: {'valori':dato}});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
+
 
 //********************************************************************************************//
 // Default route e gestione degli errori
