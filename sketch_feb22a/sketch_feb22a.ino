@@ -7,19 +7,22 @@
  */
 
 #include <WiFiS3.h>
+#include <DHT.h>
 
-const char ssid[] = "Rete davide";
-const char pass[] = "davidealessia";
-//const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
-//const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
+DHT dht(2, DHT11);
+
+//const char ssid[] = "Rete davide";
+//const char pass[] = "davidealessia";
+const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
+const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
 
 //http in lan locale
 WiFiClient client;
 int status = WL_IDLE_STATUS;
 int HTTP_PORT = 80;
 String HTTP_METHOD = "GET";  // or POST
-char HOST_NAME[] = "192.168.43.23";
-//char HOST_NAME[] = "192.168.1.32";// dove gira il server
+//char HOST_NAME[] = "192.168.43.23";
+char HOST_NAME[] = "192.168.1.32";// dove gira il server
 
 int contatore = 0;
 
@@ -32,21 +35,22 @@ int contatore = 0;
 //String PATH_NAME = "/api/dati";
 
 void setup() {
-  
+   dht.begin();
   Serial.begin(9600);
 
   client = collegaWiFi();
-
-  client = collegaServer();
-    
 }
 
 void loop() {
+  delay(300000);
+  client = collegaServer();
   datiTemperatura(client);
-  datiUmiditaAria(client);
-  datiUmiditaTerra(client);
+  //datiUmiditaAria(client);
+  //datiUmiditaTerra(client);
 
-  // the server's disconnected, stop the client:
+
+//IMPORTANTE GESTIRE CHIUSURA DELLA COMUNICAZIONE
+   //the server's disconnected, stop the client:
     client.stop();
     Serial.println();
     Serial.println("disconnected");
@@ -97,8 +101,10 @@ WiFiClient collegaWiFi() {
 }
 
 void datiTemperatura(WiFiClient client) {
+  float t = tempSens();
   String PATH_NAME = "/api/inviadati";
-  String queryString = String("?dato=13244523&tipo=temperatura");
+  String queryString = String("?dato=")+String(t)+String("&tipo=temperatura");
+
 
   client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
   client.println("Host: " + String(HOST_NAME));
@@ -146,4 +152,10 @@ void datiUmiditaTerra(WiFiClient client) {
       Serial.print(c);
     }
   }
+}
+
+float tempSens() {
+float t = dht.readTemperature();
+  Serial.println("La temperatura è di: " + String(t));
+  return t;
 }

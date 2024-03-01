@@ -9,6 +9,7 @@ $(document).ready(function () {
     let _info = $("#info");
     let _body = $("body");
     let _indietro = $("#indietro");
+    let _rilevamenti = $("#rilevamenti");
 
 
     //impostazioni di avvio
@@ -50,6 +51,7 @@ $(document).ready(function () {
     let rq = inviaRichiesta("POST", "/api/prendidati",)
     rq.then(function (response) {
         creaChart(response);
+        riempiCampi(response);
         console.log(response.data)
     })
     rq.catch(function (err) {
@@ -60,6 +62,13 @@ $(document).ready(function () {
             errore(err);
     })
 
+    function riempiCampi(response) {
+        let valoreTemperatura = response.data[0].valori;
+        console.log(valoreTemperatura);
+        let length = valoreTemperatura.length;
+        _rilevamenti.children().eq(0).text(valoreTemperatura[length-1] + "°C");
+    }
+
     function creaChart(response) {
         let valoreTemperatura = response.data[0].valori;
         console.log(valoreTemperatura);
@@ -68,7 +77,7 @@ $(document).ready(function () {
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels: ['5', '10', '15', '20', '25', '30','35', '40', '45', '50', '55', '60'],
                 datasets: [{
                     label: 'Temperatura',
                     data: valoreTemperatura,
@@ -76,7 +85,7 @@ $(document).ready(function () {
                 },
                 {
                     label: 'Umidità',
-                    data: [14, 3, 33, 21, 11, 3],
+                    data: [],
                     borderWidth: 1
                 }]
             },
