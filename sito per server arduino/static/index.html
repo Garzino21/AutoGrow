@@ -12,6 +12,7 @@
   <script src="./libreria.js"></script>
   <script src="./index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </head>
 
 
@@ -24,7 +25,7 @@
   <div id="indietro" class="button">⇦</div>
   <div class="container">
     <div id="intestazione">
-      <h1 id="title">AutoGrow</h1>
+      <h1 id="title">AUTOGROW</h1>
       <h2 id="subTitle">Your personal garden assistant</h2>
     </div>
 
@@ -69,13 +70,19 @@
         <div title="acqua rimanente">H2Oresta</div>
       </div>
 
+      
       <div id="parametri">
-        <div class="div">
+        <div class="paramTitolo" style="margin-top: 2%;">GRAFICO ILLUSTRATIVO</div>
+        <div class="div" style="background-color: transparent;">
           <div id="contenitoreCanvas">
             <canvas id="myChart"></canvas>
           </div>
         </div>
-        <div class="div">attiva spegni irrigazione</div>
+        <div class="paramTitolo">PROGRAMMA IRRIGAZIONE AUTOMATICA</div>
+        <div class="div">
+          <div id="irriga">IMPOSTA</div> 
+                fare tabelle tipo esercizi bobby main per aggiungere o togliere un certo tipo di irrigazione
+        </div>
       </div>
 
     </div>

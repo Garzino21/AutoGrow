@@ -106,21 +106,57 @@ app.post("/api/dati", async (req, res, next) => {
 
 //serve a aggiungere dati alla temperatura
 app.get("/api/inviadati", async (req, res, next) => {
-    let dato= req["query"].dato;
-    let tipo= req["query"].tipo;
+    //prendo data e ora all'invio del dato pk altrimenti dovrei avere un altro modulo su arduino
+    let now = new Date();
+    let ora;
+    console.log(now.toLocaleDateString());
+    if (now.getMinutes() < 10)
+        if (now.getMinutes() == 0)
+            ora = now.getHours() + ":" + now.getMinutes() + "0";
+        else
+            ora = now.getHours() + ":" + "0" + now.getMinutes();
+    else
+        ora = now.getHours() + ":" + now.getMinutes();
+
+    //prendo il dato e il tipo
+    let dato = req["query"].dato;
+    let tipo = req["query"].tipo;
     console.log(dato);
     console.log(tipo);
+
+    //connessione al db
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
-    let rq = collection.updateOne({tipo: tipo},{$push: {'valori':dato}});
-    rq.then((data) => res.send(data));
+
+    //cerco valore precedente 
+    let rq = collection.findOne({ 'tipo': tipo });
+    rq.then(async(data) => {
+        if (data.valori[data.valori.length - 1].dato == dato || data.valori[data.valori.length - 1].ora == ora) {
+            console.log("dato uguale");
+            res.send("dato uguale");
+        }
+        else {
+            //mi collego al db
+            const client = new MongoClient(connectionString);
+            await client.connect();
+            let collection = client.db(DBNAME).collection("dati");
+
+            //aggiungo il dato
+            let rq = collection.updateOne({ tipo: tipo }, { $addToSet: { 'valori': { "dato": dato, "ora": ora } } });
+            rq.then((data) => {
+                res.send(data);
+            }
+            );
+            rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+        }
+    });
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 });
 
 app.post("/api/prendidati", async (req, res, next) => {
-    let tipo= req["body"].tipo;
+    let tipo = req["body"].tipo;
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");

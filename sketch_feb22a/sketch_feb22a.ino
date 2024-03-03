@@ -42,12 +42,13 @@ void setup() {
 }
 
 void loop() {
-  delay(300000);
+  delay(3000);
   client = collegaServer();
   datiTemperatura(client);
-  //datiUmiditaAria(client);
+  client = collegaServer();
+  datiUmiditaAria(client);
+  delay(1000);
   //datiUmiditaTerra(client);
-
 
 //IMPORTANTE GESTIRE CHIUSURA DELLA COMUNICAZIONE
    //the server's disconnected, stop the client:
@@ -121,8 +122,9 @@ void datiTemperatura(WiFiClient client) {
 }
 
 void datiUmiditaAria(WiFiClient client) {
+    int h = humSens();
   String PATH_NAME = "/api/inviadati";
-  String queryString = String("?dato=1323&tipo=umiditaAria");
+  String queryString = String("?dato=")+String(h)+String("&tipo=umiditaAria");
   client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
   client.println("Host: " + String(HOST_NAME));
   client.println("Connection: close");
@@ -158,4 +160,10 @@ float tempSens() {
 float t = dht.readTemperature();
   Serial.println("La temperatura è di: " + String(t));
   return t;
+}
+
+int humSens() {
+  int h = dht.readHumidity();
+  Serial.println("Hai un umidità di: " + String(h) + "%");
+  return h;
 }

@@ -19,7 +19,7 @@ $(document).ready(function () {
     _indietro.hide();
 
     //gestione eventi
-    _apri.on("click",function () {
+    _apri.on("click", function () {
         _paginaIniziale.hide();
         _paginaDati.show();
         _info.hide();
@@ -33,6 +33,7 @@ $(document).ready(function () {
         _paginaIniziale.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
+
     })
 
     _indietro.on("click", function () {
@@ -63,21 +64,52 @@ $(document).ready(function () {
     })
 
     function riempiCampi(response) {
-        let valoreTemperatura = response.data[0].valori;
+        let valoreTemperatura = response.data[0].valori[response.data[0].valori.length - 1].dato;
         console.log(valoreTemperatura);
         let length = valoreTemperatura.length;
-        _rilevamenti.children().eq(0).text(valoreTemperatura[length-1] + "°C");
+        _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
+
+        let umiditaAria = response.data[1].valori[response.data[1].valori.length - 1].dato;
+        console.log(umiditaAria);
+        let length1 = umiditaAria.length;
+        _rilevamenti.children().eq(1).text(umiditaAria + "%");
     }
 
     function creaChart(response) {
-        let valoreTemperatura = response.data[0].valori;
-        console.log(valoreTemperatura);
+        let data = [];
+        //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+        let valoreTemperatura = [];
+        for (let item of response.data[0].valori) {
+            valoreTemperatura.push(item.dato);
+            data.push(item.ora);
+        }
+
+        //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
+        let umiditaAria = [];
+        for (let item of response.data[1].valori) {
+            umiditaAria.push(item.dato);
+        }
+
+        console.log(valoreTemperatura, data);
+
+        //se i dati sono più di 12 li taglio
+        if (valoreTemperatura.length > 12) {
+            valoreTemperatura = valoreTemperatura.slice(valoreTemperatura.length - 12);
+        }
+        if (umiditaAria.length > 12) {
+            umiditaAria = umiditaAria.slice(umiditaAria.length - 12);
+        }
+        if (data.length > 12) {
+            data = data.slice(data.length - 12);
+        }
         const ctx = $("#myChart")
+
+        //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
 
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['5', '10', '15', '20', '25', '30','35', '40', '45', '50', '55', '60'],
+                labels: data,
                 datasets: [{
                     label: 'Temperatura',
                     data: valoreTemperatura,
@@ -85,12 +117,12 @@ $(document).ready(function () {
                 },
                 {
                     label: 'Umidità',
-                    data: [],
+                    data: umiditaAria,
                     borderWidth: 1
                 }]
             },
             options: {
-                
+
                 responsive: true,
                 scales: {
                     y: {
@@ -100,5 +132,17 @@ $(document).ready(function () {
             }
         });
     }
+
+    let _impostaIrrigazione = $("#irriga");
+    _impostaIrrigazione.on("click", function () {
+        swal({
+            text: 'Search for a movie. e.g. "La La Land".',
+            content: "input",
+            button: {
+                text: "Search!",
+                closeModal: false,
+            },
+        })
+    });
 
 });

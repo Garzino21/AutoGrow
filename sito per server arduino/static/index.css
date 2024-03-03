@@ -160,7 +160,7 @@ provs{
 {
   padding-top:  20px ;
   font-weight: bold;
-  text-align: center;
+
   font-size: 2em;
   border-radius: 25px;
   background-color: rgb(109, 137, 102);
@@ -185,6 +185,7 @@ provs{
 
 #parametri .div
 {
+  display: inline-block;
   border-radius: 25px;
   background-color: rgb(109, 137, 102);
   height: 100%;
@@ -193,18 +194,52 @@ provs{
   display: inline-block;
 }
 
-#parametri :nth-child(1)
+#parametri :nth-child(2)
 {
   float: left;
 }
 
-#parametri :nth-child(2)
+.paramTitolo
 {
-  height: 100px;
+  margin-top: 5%;
+  color:  rgb(109, 137, 102);
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  height: 40px;
+  font-size: 1.8em;
+  font-weight: bold;  
+}
+
+#parametri :nth-child(4)
+{
+  height: 400px;
   padding-top: 20px;
+  font-size: 1.5em;
+  font-weight: bold;  
+}
+
+#irriga
+{
+  margin-left: 3%;
+  width: 180px;
+  height: 60px;
+  border: 5px solid rgb(60, 123, 42);  
+  background-color: rgb(60, 123, 42);
+  color: rgb(144, 210, 126);
+  font-size: 1.5em;
+  text-align: center;
+  border-radius: 25px;
+  float: left;
+}
+
+#pTitolo
+{
+  position: absolute;
+  float: right;
   font-size: 2em;
   font-weight: bold;
-  float: right;
+  margin-bottom: 2%;
 }
 
 #myChart
@@ -222,4 +257,5 @@ provs{
   border-radius: 25px;
   background-color: white;
 }
+
 
