@@ -233,6 +233,21 @@ provs{
   float: left;
 }
 
+#accedi
+{
+  position: absolute;
+
+  width: 180px;
+  height: 60px;
+  border: 5px solid rgb(60, 123, 42);  
+  background-color: rgb(60, 123, 42);
+  color: rgb(144, 210, 126);
+  font-size: 1.5em;
+  text-align: center;
+  border-radius: 25px;
+  float: left;
+}
+
 #pTitolo
 {
   position: absolute;
@@ -256,6 +271,16 @@ provs{
   height: 100%;
   border-radius: 25px;
   background-color: white;
+}
+
+#impostazioni:hover
+{
+  background-color: rgb(93, 111, 89);
+}
+
+#impostazioni
+{
+  position: relative;
 }
 
 

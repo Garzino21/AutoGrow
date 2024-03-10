@@ -44,9 +44,7 @@ void setup() {
 void loop() {
   delay(3000);
   client = collegaServer();
-  datiTemperatura(client);
-  client = collegaServer();
-  datiUmiditaAria(client);
+  inviaDati(client);
   delay(1000);
   //datiUmiditaTerra(client);
 
@@ -101,30 +99,14 @@ WiFiClient collegaWiFi() {
   return client;
 }
 
-void datiTemperatura(WiFiClient client) {
+void inviaDati(WiFiClient client) {
   float t = tempSens();
+  int h = humSens();
+
   String PATH_NAME = "/api/inviadati";
-  String queryString = String("?dato=")+String(t)+String("&tipo=temperatura");
+  String queryString = String("?temp=")+String(t)+String("&hum=")+String(h);
 
 
-  client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
-  client.println("Host: " + String(HOST_NAME));
-  client.println("Connection: close");
-  client.println();  // end HTTP header
-
-  while (client.connected()) {
-    if (client.available()) {
-      // read an incoming byte from the server and print it to serial monitor:
-      char c = client.read();
-      Serial.print(c);
-    }
-  }
-}
-
-void datiUmiditaAria(WiFiClient client) {
-    int h = humSens();
-  String PATH_NAME = "/api/inviadati";
-  String queryString = String("?dato=")+String(h)+String("&tipo=umiditaAria");
   client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
   client.println("Host: " + String(HOST_NAME));
   client.println("Connection: close");

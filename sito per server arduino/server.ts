@@ -109,6 +109,7 @@ app.get("/api/inviadati", async (req, res, next) => {
     //prendo data e ora all'invio del dato pk altrimenti dovrei avere un altro modulo su arduino
     let now = new Date();
     let ora;
+    let date=now.toLocaleDateString();
     console.log(now.toLocaleDateString());
     if (now.getMinutes() < 10)
         if (now.getMinutes() == 0)
@@ -119,40 +120,49 @@ app.get("/api/inviadati", async (req, res, next) => {
         ora = now.getHours() + ":" + now.getMinutes();
 
     //prendo il dato e il tipo
-    let dato = req["query"].dato;
-    let tipo = req["query"].tipo;
-    console.log(dato);
-    console.log(tipo);
+    let temp = req["query"].temp;
+    let hum = req["query"].hum;
+    console.log(temp);
+    console.log(hum);
 
-    //connessione al db
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
+    let rq = collection.find({}).toArray();
+    rq.then(async (data) => {
+        let aggiungiT: boolean = false;
+        let aggiungiH: boolean = false;
 
-    //cerco valore precedente 
-    let rq = collection.findOne({ 'tipo': tipo });
-    rq.then(async(data) => {
-        if (data.valori[data.valori.length - 1].dato == dato || data.valori[data.valori.length - 1].ora == ora) {
+        for (let dato of data) {
+            if (dato.tipo == "temperatura") {
+                if (dato.valori[dato.valori.length - 1].dato == temp)
+                    aggiungiT = false;
+                else
+                    aggiungiT = true;
+
+            }
+            else if (dato.tipo == "umiditaAria") {
+                if (dato.valori[dato.valori.length - 1].dato == hum)
+                    aggiungiH = false;
+                else
+                    aggiungiH = true;
+            }
+        }
+
+        if (aggiungiT || aggiungiH) {
+            await aggiungoTemperatura(temp, ora, res,date);
+            await aggiungoUmidita(hum, ora, res,date);
+            res.send("aggiunto");
+        }
+        else {
             console.log("dato uguale");
             res.send("dato uguale");
         }
-        else {
-            //mi collego al db
-            const client = new MongoClient(connectionString);
-            await client.connect();
-            let collection = client.db(DBNAME).collection("dati");
 
-            //aggiungo il dato
-            let rq = collection.updateOne({ tipo: tipo }, { $addToSet: { 'valori': { "dato": dato, "ora": ora } } });
-            rq.then((data) => {
-                res.send(data);
-            }
-            );
-            rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
-        }
     });
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
+
 });
 
 app.post("/api/prendidati", async (req, res, next) => {
@@ -165,6 +175,37 @@ app.post("/api/prendidati", async (req, res, next) => {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 });
+
+async function aggiungoUmidita(hum: any, ora: any, res: any,date:any) {
+    //mi collego al db
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("dati");
+
+    //aggiungo il dato
+    let rq = collection.updateOne({ tipo: 'umiditaAria' }, { $addToSet: { 'valori': { "dato": hum, "ora": ora, "data":date} } });
+    rq.then((data) => {
+        console.log("aggiunta umidita");
+    }
+    );
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+}
+
+
+async function aggiungoTemperatura(temp: any, ora: any, res: any,date:any) {
+    //mi collego al db
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("dati");
+
+    //aggiungo il dato
+    let rq = collection.updateOne({ tipo: 'temperatura' }, { $addToSet: { 'valori': { "dato": temp, "ora": ora, "data":date} } });
+    rq.then((data) => {
+        console.log("aggiunta temperatura");
+    }
+    );
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+}
 
 
 
@@ -186,3 +227,7 @@ app.use("/", (err, req, res, next) => {
     console.log("************* SERVER ERROR ***************\n", err.stack);
     res.status(500).send(err.message);
 });
+
+
+
+

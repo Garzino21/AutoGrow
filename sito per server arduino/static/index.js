@@ -53,7 +53,7 @@ $(document).ready(function () {
     rq.then(function (response) {
         creaChart(response);
         riempiCampi(response);
-        console.log(response.data)
+        console.log(response)
     })
     rq.catch(function (err) {
         if (err.response.status == 401) {
@@ -63,33 +63,54 @@ $(document).ready(function () {
             errore(err);
     })
 
-    function riempiCampi(response) {
-        let valoreTemperatura = response.data[0].valori[response.data[0].valori.length - 1].dato;
-        console.log(valoreTemperatura);
-        let length = valoreTemperatura.length;
-        _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
+    
 
-        let umiditaAria = response.data[1].valori[response.data[1].valori.length - 1].dato;
-        console.log(umiditaAria);
-        let length1 = umiditaAria.length;
-        _rilevamenti.children().eq(1).text(umiditaAria + "%");
+    function riempiCampi(response) {
+        for (let item of response.data) {
+            if (item.tipo == "temperatura") {
+                let valoreTemperatura = item.valori[item.valori.length - 1].dato;
+                console.log(valoreTemperatura);
+                let length = valoreTemperatura.length;
+                _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
+            }
+            else if (item.tipo == "umiditaAria") {
+                let umiditaAria = item.valori[item.valori.length - 1].dato;
+                console.log(umiditaAria);
+                let length1 = umiditaAria.length;
+                _rilevamenti.children().eq(1).text(umiditaAria + "%");
+            }
+        }
+
+
+
     }
 
     function creaChart(response) {
         let data = [];
-        //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+       
         let valoreTemperatura = [];
-        for (let item of response.data[0].valori) {
-            valoreTemperatura.push(item.dato);
-            data.push(item.ora);
-        }
-
-        //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
         let umiditaAria = [];
-        for (let item of response.data[1].valori) {
-            umiditaAria.push(item.dato);
+
+        for (let item of response.data) {
+            if(item.tipo == "temperatura")
+            {
+                 //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+                for (let valore of item.valori) {
+                    valoreTemperatura.push(valore.dato);
+                    data.push(valore.ora);
+                }
+            }
+            else if(item.tipo == "umiditaAria")
+            {
+                //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
+                for (let valore of item.valori) {
+                    umiditaAria.push(valore.dato);
+                }
+            }
         }
 
+        
+        
         console.log(valoreTemperatura, data);
 
         //se i dati sono più di 12 li taglio
@@ -105,7 +126,7 @@ $(document).ready(function () {
         const ctx = $("#myChart")
 
         //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
-
+        
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -128,9 +149,11 @@ $(document).ready(function () {
                     y: {
                         beginAtZero: true
                     }
-                }
+                },
+                
             }
         });
+       
     }
 
     let _impostaIrrigazione = $("#irriga");
