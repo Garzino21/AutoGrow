@@ -109,7 +109,7 @@ app.get("/api/inviadati", async (req, res, next) => {
     //prendo data e ora all'invio del dato pk altrimenti dovrei avere un altro modulo su arduino
     let now = new Date();
     let ora;
-    let date=now.toLocaleDateString();
+    let date = now.toLocaleDateString();
     console.log(now.toLocaleDateString());
     if (now.getMinutes() < 10)
         if (now.getMinutes() == 0)
@@ -129,11 +129,21 @@ app.get("/api/inviadati", async (req, res, next) => {
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
     let rq = collection.find({}).toArray();
-    rq.then(async (data) => {
+    rq.then(async (risposta) => {
         let aggiungiT: boolean = false;
         let aggiungiH: boolean = false;
 
-        for (let dato of data) {
+        console.log("cristo:" + risposta[0].valori[(risposta[0].valori.length) - 2].data + "asdf" + date);
+
+        if (risposta[0].valori[(risposta[0].valori.length) - 3].data != date) {    //date data di oggi
+            console.log("aggiorno storicoooooooooooooooooooooooooooooooooo");
+            //await aggiornaStorico(risposta, date, res, req);
+
+            //nello storico devo ancora vedere il salvataggio dei dati che salva il doppio e 
+            //devo eliminare i dati vecchi da dati una volta che funziona
+        }
+
+        for (let dato of risposta) {
             if (dato.tipo == "temperatura") {
                 if (dato.valori[dato.valori.length - 1].dato == temp)
                     aggiungiT = false;
@@ -149,14 +159,15 @@ app.get("/api/inviadati", async (req, res, next) => {
             }
         }
 
+
         if (aggiungiT || aggiungiH) {
-            await aggiungoTemperatura(temp, ora, res,date);
-            await aggiungoUmidita(hum, ora, res,date);
+            await aggiungoTemperatura(temp, ora, res, date);
+            await aggiungoUmidita(hum, ora, res, date);
             res.send("aggiunto");
         }
         else {
-            console.log("dato uguale");
-            res.send("dato uguale");
+            console.log("dati uguali");
+            res.send("dati uguali");
         }
 
     });
@@ -176,14 +187,14 @@ app.post("/api/prendidati", async (req, res, next) => {
     rq.finally(() => client.close());
 });
 
-async function aggiungoUmidita(hum: any, ora: any, res: any,date:any) {
+async function aggiungoUmidita(hum: any, ora: any, res: any, date: any) {
     //mi collego al db
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
 
     //aggiungo il dato
-    let rq = collection.updateOne({ tipo: 'umiditaAria' }, { $addToSet: { 'valori': { "dato": hum, "ora": ora, "data":date} } });
+    let rq = collection.updateOne({ tipo: 'umiditaAria' }, { $addToSet: { 'valori': { "dato": hum, "ora": ora, "data": date } } });
     rq.then((data) => {
         console.log("aggiunta umidita");
     }
@@ -192,19 +203,52 @@ async function aggiungoUmidita(hum: any, ora: any, res: any,date:any) {
 }
 
 
-async function aggiungoTemperatura(temp: any, ora: any, res: any,date:any) {
+async function aggiungoTemperatura(temp: any, ora: any, res: any, date: any) {
     //mi collego al db
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
 
     //aggiungo il dato
-    let rq = collection.updateOne({ tipo: 'temperatura' }, { $addToSet: { 'valori': { "dato": temp, "ora": ora, "data":date} } });
+    let rq = collection.updateOne({ tipo: 'temperatura' }, { $addToSet: { 'valori': { "dato": temp, "ora": ora, "data": date } } });
     rq.then((data) => {
         console.log("aggiunta temperatura");
     }
     );
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+}
+
+async function aggiornaStorico(data: import("mongodb").WithId<import("bson").Document>[], date: string, res: any, req: any) {
+    return new Promise(async (resolve, reject) => {
+        let valoriVecchi = [];
+        let aggiungi = {};
+        let campo = {};
+        for (let dato of data) {
+            console.log("data: "+data);
+            let contatore = 0;
+            for (let valore of dato.valori) {
+                aggiungi = { "ora": valore.ora, "valore": valore.dato };
+                valoriVecchi.push(aggiungi);
+                campo = { "tipo": dato.tipo, "data": valore.data, "valori": valoriVecchi };
+                contatore++;
+                if (contatore == dato.valori.length - 1) {
+                    console.log(dato.tipo);
+                    console.log(contatore);
+
+                    const client = new MongoClient(connectionString);
+                    await client.connect();
+                    let collection = client.db(DBNAME).collection("storico");
+                    //aggiungo il dato
+                    let rq = collection.insertOne(campo);
+                    rq.then((data) => {
+                        resolve("aggiunto" + dato.tipo);
+                    });
+                    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+                }
+            }
+        }
+        resolve("finito");
+    });
 }
 
 
@@ -227,6 +271,8 @@ app.use("/", (err, req, res, next) => {
     console.log("************* SERVER ERROR ***************\n", err.stack);
     res.status(500).send(err.message);
 });
+
+
 
 
 

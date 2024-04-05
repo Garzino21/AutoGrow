@@ -160,7 +160,6 @@ provs{
 {
   padding-top:  20px ;
   font-weight: bold;
-
   font-size: 2em;
   border-radius: 25px;
   background-color: rgb(109, 137, 102);
@@ -235,8 +234,6 @@ provs{
 
 #accedi
 {
-  position: absolute;
-
   width: 180px;
   height: 60px;
   border: 5px solid rgb(60, 123, 42);  

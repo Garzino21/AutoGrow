@@ -33,7 +33,6 @@ $(document).ready(function () {
         _paginaIniziale.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
-
     })
 
     _indietro.on("click", function () {
@@ -49,8 +48,9 @@ $(document).ready(function () {
     //prendo dati dal db
 
     let tipo = "temperatura";
-    let rq = inviaRichiesta("POST", "/api/prendidati",)
+    let rq = inviaRichiesta("POST", "/api/prendidati")
     rq.then(function (response) {
+        //controlloData(response);
         creaChart(response);
         riempiCampi(response);
         console.log(response)
@@ -63,7 +63,7 @@ $(document).ready(function () {
             errore(err);
     })
 
-    
+
 
     function riempiCampi(response) {
         for (let item of response.data) {
@@ -87,21 +87,19 @@ $(document).ready(function () {
 
     function creaChart(response) {
         let data = [];
-       
+
         let valoreTemperatura = [];
         let umiditaAria = [];
 
         for (let item of response.data) {
-            if(item.tipo == "temperatura")
-            {
-                 //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+            if (item.tipo == "temperatura") {
+                //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
                 for (let valore of item.valori) {
                     valoreTemperatura.push(valore.dato);
                     data.push(valore.ora);
                 }
             }
-            else if(item.tipo == "umiditaAria")
-            {
+            else if (item.tipo == "umiditaAria") {
                 //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
                 for (let valore of item.valori) {
                     umiditaAria.push(valore.dato);
@@ -109,8 +107,8 @@ $(document).ready(function () {
             }
         }
 
-        
-        
+
+
         console.log(valoreTemperatura, data);
 
         //se i dati sono più di 12 li taglio
@@ -126,7 +124,7 @@ $(document).ready(function () {
         const ctx = $("#myChart")
 
         //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
-        
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -150,11 +148,35 @@ $(document).ready(function () {
                         beginAtZero: true
                     }
                 },
-                
+
             }
         });
-       
+
     }
+
+
+
+    /*function controlloData(response) {
+        let dati = [];
+        for (let item of response.data) {
+            if(item.tipo=="temperatura")
+            {
+                if (item.valori[item.valori.length - 1].data != new Date().toLocaleDateString()) {    
+                    let rq = inviaRichiesta("POST", "/api/aggiornaStorico", );
+                    rq.then(function (response) {
+                        console.log(response);
+                    })
+                    rq.catch(function (err) {
+                        if (err.response.status == 401) {
+                            _lblErrore.show();
+                        }
+                        else
+                            errore(err);
+                    })
+                }
+            }
+        }
+    }*/
 
     let _impostaIrrigazione = $("#irriga");
     _impostaIrrigazione.on("click", function () {

@@ -11,18 +11,18 @@
 
 DHT dht(2, DHT11);
 
-//const char ssid[] = "Rete davide";
-//const char pass[] = "davidealessia";
-const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
-const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
+const char ssid[] = "Rete davide";
+const char pass[] = "davidealessia";
+//const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
+//const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
 
 //http in lan locale
 WiFiClient client;
 int status = WL_IDLE_STATUS;
 int HTTP_PORT = 80;
 String HTTP_METHOD = "GET";  // or POST
-//char HOST_NAME[] = "192.168.43.23";
-char HOST_NAME[] = "192.168.1.32";// dove gira il server
+char HOST_NAME[] = "192.168.43.23";
+//char HOST_NAME[] = "192.168.1.32";// dove gira il server
 
 int contatore = 0;
 
@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-  delay(3000);
+  delay(1000);
   client = collegaServer();
   inviaDati(client);
   delay(1000);
@@ -104,7 +104,8 @@ void inviaDati(WiFiClient client) {
   int h = humSens();
 
   String PATH_NAME = "/api/inviadati";
-  String queryString = String("?temp=")+String(t)+String("&hum=")+String(h);
+  //String queryString = String("?temp=")+String(t)+String("&hum=")+String(h);
+  String queryString = String("?temp=22")+String("&hum=55");
 
 
   client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
