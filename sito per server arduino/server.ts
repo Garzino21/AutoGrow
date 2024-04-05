@@ -137,11 +137,10 @@ app.get("/api/inviadati", async (req, res, next) => {
 
         if (risposta[0].valori[(risposta[0].valori.length) - 3].data != date) {    //date data di oggi
             console.log("aggiorno storicoooooooooooooooooooooooooooooooooo");
-            //await aggiornaStorico(risposta, date, res, req);
-
-            //nello storico devo ancora vedere il salvataggio dei dati che salva il doppio e 
+            //await aggiornaStorico(risposta, date, res, req); 
             //devo eliminare i dati vecchi da dati una volta che funziona
         }
+        console.log("se fossi negro vorrei essere bianco");
 
         for (let dato of risposta) {
             if (dato.tipo == "temperatura") {
@@ -220,35 +219,42 @@ async function aggiungoTemperatura(temp: any, ora: any, res: any, date: any) {
 
 async function aggiornaStorico(data: import("mongodb").WithId<import("bson").Document>[], date: string, res: any, req: any) {
     return new Promise(async (resolve, reject) => {
-        let valoriVecchi = [];
-        let aggiungi = {};
-        let campo = {};
+
         for (let dato of data) {
-            console.log("data: "+data);
+            let valoriVecchi = [];
+            let aggiungi = {};
+            let campo = {};
             let contatore = 0;
             for (let valore of dato.valori) {
+
                 aggiungi = { "ora": valore.ora, "valore": valore.dato };
                 valoriVecchi.push(aggiungi);
                 campo = { "tipo": dato.tipo, "data": valore.data, "valori": valoriVecchi };
                 contatore++;
-                if (contatore == dato.valori.length - 1) {
+
+                if (contatore == dato.valori.length) {
                     console.log(dato.tipo);
                     console.log(contatore);
 
-                    const client = new MongoClient(connectionString);
-                    await client.connect();
-                    let collection = client.db(DBNAME).collection("storico");
-                    //aggiungo il dato
-                    let rq = collection.insertOne(campo);
-                    rq.then((data) => {
-                        resolve("aggiunto" + dato.tipo);
-                    });
-                    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+                    await aggiungoDatiStorico(campo, res, req, dato.tipo);
+
                 }
             }
         }
-        resolve("finito");
+        resolve("aggiunto");
     });
+}
+
+async function aggiungoDatiStorico(campo: any, res: any, req: any, tipo: any) {
+        const client = new MongoClient(connectionString);
+        await client.connect();
+        let collection = client.db(DBNAME).collection("storico");
+        //aggiungo il dato
+        let rq = collection.insertOne(campo);
+        rq.then(async (data) => {
+            console.log("aggiunta: " + tipo);
+        });
+        rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
 }
 
 
