@@ -10,6 +10,10 @@ $(document).ready(function () {
     let _body = $("body");
     let _indietro = $("#indietro");
     let _rilevamenti = $("#rilevamenti");
+    let _modalitaIrrigazione = $("#btnModalita");
+    let _tabAutomatico = $("#tabAutomatico");
+    let _btnAccendi = $("#btnAccendi");
+    let _btnSpegni = $("#btnSpegni");   
 
 
     //impostazioni di avvio
@@ -17,6 +21,9 @@ $(document).ready(function () {
     _paginaDati.hide();
     _progetto.hide();
     _indietro.hide();
+
+    _btnAccendi.hide();
+    _btnSpegni.hide();
 
     //gestione eventi
     _apri.on("click", function () {
@@ -44,6 +51,39 @@ $(document).ready(function () {
         _indietro.hide();
         _body.css("overflow", "hidden");
     })
+
+    _modalitaIrrigazione.on("click", function () {
+        if (_modalitaIrrigazione.text() == "MANUALE") 
+        {
+            _modalitaIrrigazione.text("AUTOMATICO");
+            _tabAutomatico.show();
+            _btnAccendi.hide();
+            _btnSpegni.hide();
+        }
+        else
+        {
+            _tabAutomatico.hide();
+            _modalitaIrrigazione.text("MANUALE");
+            _btnAccendi.show();
+            _btnSpegni.show();
+        }
+    });
+
+    _btnAccendi.on("click", function () {
+        if (_btnAccendi.css("background-color") == "red") {
+            _btnAccendi.css({"background-color": "green", "border-color": "green"});
+        }
+        else
+        _btnSpegni.css({"background-color": "red", "border-color": "red"});
+    });
+
+    _btnSpegni.on("click", function () {
+        if (_btnSpegni.css("background-color") == "red") {
+            _btnSpegni.css({"background-color": "green", "border-color": "green"});
+        }
+        else
+        _btnAccendi.css({"background-color": "red", "border-color": "red"});
+    });
 
     //prendo dati dal db
 

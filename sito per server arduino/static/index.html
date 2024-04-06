@@ -21,7 +21,7 @@
   <!--<video muted autoplay loop class="videofullscreen">
     <source src="img/forest2.mp4" type="video/mp4">
   </video>-->
-  
+
   <div id="indietro" class="button">⇦</div>
   <div class="container">
     <div id="intestazione">
@@ -38,22 +38,36 @@
       <h2 style="color: rgb(144, 210, 126); font-weight: bold;">IL PROGETTO</h2>
       <img src="img/background.png" alt="non trovato" class="textImage">
       <h2 style="color: rgb(144, 210, 126); font-weight: bold;">CHI SIAMO?</h2>
-      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è un progetto nato con l'obiettivo di rendere l'arte della semina e della cura delle piante 
-      un'attività semplice e alla portata di tutti. Con <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span>, la semina e la cura delle piante non saranno più un'attività noiosa per il semplice fatto che
-      il processo di irrigazione e cura del terreno è totalmente automatizzato. Non vedrai l'ora di vedere crescere le tue piante!!
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è un progetto nato con l'obiettivo di
+      rendere l'arte della semina e della cura delle piante
+      un'attività semplice e alla portata di tutti. Con <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto
+        Grow</span>, la semina e la cura delle piante non saranno più un'attività noiosa per il semplice fatto che
+      il processo di irrigazione e cura del terreno è totalmente automatizzato. Non vedrai l'ora di vedere crescere le
+      tue piante!!
       <br>
       <br>
       <h2 style="color: rgb(144, 210, 126); font-weight: bold;">COME FUNZIONA?</h2>
-      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> cerca di ottimizzare l'utilizzo delle risorse indispensabili per la fotosintesi quali acqua, luce e di rendere il processo di irrigazione il più efficiente possibile.
-      Il sistema è composto da una serie di sensori che monitorano costantemente il terreno. In base a queste informazioni, il sistema decide se e quanto irrigare.
-      Dal sito web, è possibile monitorare lo stato del terreno e delle piante, e modificare le impostazioni di irrigazione.
-      Attraverso dei semplici comandi, è possibile attivare o disattivare l'irrigazione automatica, passando così alla versione manuale.
-      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è stata progettata ad hoc per essere il più semplice possibile da utilizzare, in modo che tutti possano godere dei benefici di avere un giardino in casa.
-      Il suo design è stato pensato per essere il più compatto possibile, in modo da poter essere posizionato in qualsiasi ambiente.
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> cerca di ottimizzare l'utilizzo delle
+      risorse indispensabili per la fotosintesi quali acqua, luce e di rendere il processo di irrigazione il più
+      efficiente possibile.
+      Il sistema è composto da una serie di sensori che monitorano costantemente il terreno. In base a queste
+      informazioni, il sistema decide se e quanto irrigare.
+      Dal sito web, è possibile monitorare lo stato del terreno e delle piante, e modificare le impostazioni di
+      irrigazione.
+      Attraverso dei semplici comandi, è possibile attivare o disattivare l'irrigazione automatica, passando così alla
+      versione manuale.
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> è stata progettata ad hoc per essere
+      il più semplice possibile da utilizzare, in modo che tutti possano godere dei benefici di avere un giardino in
+      casa.
+      Il suo design è stato pensato per essere il più compatto possibile, in modo da poter essere posizionato in
+      qualsiasi ambiente.
       <br>
       <br>
-      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> nasce dall'esigenza di riuscire a anticipare la semina delle piante aromatiche, quali il basilico, il prezzemolo, la menta, il timo e la salvia, in modo da poterle avere a disposizione prima del periodo 
-      primaverile. Inoltre, il sistema è stato progettato per essere il più versatile possibile, in modo da poter essere utilizzato per qualsiasi tipo di pianta.
+      <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> nasce dall'esigenza di riuscire a
+      anticipare la semina delle piante aromatiche, quali il basilico, il prezzemolo, la menta, il timo e la salvia, in
+      modo da poterle avere a disposizione prima del periodo
+      primaverile. Inoltre, il sistema è stato progettato per essere il più versatile possibile, in modo da poter essere
+      utilizzato per qualsiasi tipo di pianta.
     </div>
 
     <div id="paginaDati" class="application">
@@ -65,7 +79,7 @@
         <div title="acqua rimanente">H2Oresta</div>
       </div>
 
-      
+
       <div id="parametri">
         <div class="paramTitolo" style="margin-top: 2%;">GRAFICO ILLUSTRATIVO</div>
         <div class="div" style="background-color: transparent;">
@@ -74,10 +88,46 @@
           </div>
         </div>
         <div class="paramTitolo">PROGRAMMA IRRIGAZIONE AUTOMATICA</div>
-        <div class="div" id="impostazioni">
-          <div id="irriga">IMPOSTA</div> 
-          <div id="accedi">ACCEDI</div> 
-                fare tabelle tipo esercizi bobby main per aggiungere o togliere un certo tipo di irrigazione
+        <div class="div cont" id="impostazioni">
+          <div id="btnModalita" class="button" style="width: fit-content; margin-bottom: 20px;">AUTOMATICO</div>
+          <br>
+          <div id="btnAccendi" class="button irrig" style="width: fit-content; margin-bottom: 20px;">ACCENDI</div>
+          <div id="btnSpegni" class="button irrig" style="width: fit-content; margin-bottom: 20px;">SPEGNI</div>
+          <table id="tabAutomatico">
+            <thead>
+              <tr>
+                <td>QUANDO TERRENO</td>
+                <td>FINO A QUANDO</td>
+                <td>POTENZA</td>
+                <td>RITARDO DISATTIVAZIONE</td>
+                <td>ATTIVA</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cella 4</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+              </tr>
+              <tr>
+                <td>Cella 4</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+              </tr>
+              <tr>
+                <td>Cella 4</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+                <td>Cella 5</td>
+                <td>Cella 6</td>
+              </tr>
+              
+            </tbody>
+          </table>
         </div>
       </div>
 

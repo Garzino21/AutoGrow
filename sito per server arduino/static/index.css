@@ -190,13 +190,8 @@ provs{
   height: 100%;
   width: 96%;
   margin: 2%;
-  display: inline-block;
 }
 
-#parametri :nth-child(2)
-{
-  float: left;
-}
 
 .paramTitolo
 {
@@ -210,39 +205,12 @@ provs{
   font-weight: bold;  
 }
 
-#parametri :nth-child(4)
+.cont
 {
-  height: 400px;
+  height: 100%;
   padding-top: 20px;
-  font-size: 1.5em;
+  padding-bottom: 20px;
   font-weight: bold;  
-}
-
-#irriga
-{
-  margin-left: 3%;
-  width: 180px;
-  height: 60px;
-  border: 5px solid rgb(60, 123, 42);  
-  background-color: rgb(60, 123, 42);
-  color: rgb(144, 210, 126);
-  font-size: 1.5em;
-  text-align: center;
-  border-radius: 25px;
-  float: left;
-}
-
-#accedi
-{
-  width: 180px;
-  height: 60px;
-  border: 5px solid rgb(60, 123, 42);  
-  background-color: rgb(60, 123, 42);
-  color: rgb(144, 210, 126);
-  font-size: 1.5em;
-  text-align: center;
-  border-radius: 25px;
-  float: left;
 }
 
 #pTitolo
@@ -268,16 +236,22 @@ provs{
   height: 100%;
   border-radius: 25px;
   background-color: white;
+} 
+
+table
+{
+  width: 80%;
+  margin: 0 auto;
 }
 
-#impostazioni:hover
+td
 {
-  background-color: rgb(93, 111, 89);
+  border: 2px solid black;
 }
 
-#impostazioni
+.irrig
 {
-  position: relative;
+  
 }
 
 
