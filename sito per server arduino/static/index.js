@@ -12,8 +12,8 @@ $(document).ready(function () {
     let _rilevamenti = $("#rilevamenti");
     let _modalitaIrrigazione = $("#btnModalita");
     let _tabAutomatico = $("#tabAutomatico");
-    let _btnAccendi = $("#btnAccendi");
-    let _btnSpegni = $("#btnSpegni");   
+    let _btnStato = $("#btnStato");
+    let modIrr = "";
 
 
     //impostazioni di avvio
@@ -22,8 +22,7 @@ $(document).ready(function () {
     _progetto.hide();
     _indietro.hide();
 
-    _btnAccendi.hide();
-    _btnSpegni.hide();
+    _btnStato.hide();
 
     //gestione eventi
     _apri.on("click", function () {
@@ -53,40 +52,28 @@ $(document).ready(function () {
     })
 
     _modalitaIrrigazione.on("click", function () {
-        if (_modalitaIrrigazione.text() == "MANUALE") 
-        {
-            _modalitaIrrigazione.text("AUTOMATICO");
-            _tabAutomatico.show();
-            _btnAccendi.hide();
-            _btnSpegni.hide();
+        if (_modalitaIrrigazione.text() == "MANUALE") {
+            _modalitaIrrigazione.text("Caricamento...");
+            aggiornoDb("AUTOMATICO");
         }
-        else
-        {
-            _tabAutomatico.hide();
-            _modalitaIrrigazione.text("MANUALE");
-            _btnAccendi.show();
-            _btnSpegni.show();
+        else {
+            _modalitaIrrigazione.text("Caricamento...");
+            aggiornoDb("MANUALE");
         }
     });
 
-    _btnAccendi.on("click", function () {
-        if (_btnAccendi.css("background-color") == "red") {
-            _btnAccendi.css({"background-color": "green", "border-color": "green"});
+    _btnStato.on("click", function () {
+        if (_btnStato.text() == "ACCENDI") {
+            _btnStato.text("SPEGNI").css({ "background-color": "red", "border-color": "red" });
+            swal("HAI ACCESO L'IRRIGAZIONE", "", "success");
         }
-        else
-        _btnSpegni.css({"background-color": "red", "border-color": "red"});
-    });
-
-    _btnSpegni.on("click", function () {
-        if (_btnSpegni.css("background-color") == "red") {
-            _btnSpegni.css({"background-color": "green", "border-color": "green"});
+        else {
+            _btnStato.text("ACCENDI").css({ "background-color": "green", "border-color": "green" });;
+            swal("HAI SPENTO L'IRRIGAZIONE", "", "success");
         }
-        else
-        _btnAccendi.css({"background-color": "red", "border-color": "red"});
     });
 
     //prendo dati dal db
-
     let tipo = "temperatura";
     let rq = inviaRichiesta("POST", "/api/prendidati")
     rq.then(function (response) {
@@ -103,6 +90,69 @@ $(document).ready(function () {
             errore(err);
     })
 
+    //prendo azioni
+    rq = inviaRichiesta("POST", "/api/prendiazioni")
+    rq.then(function (response) {
+        //controlloData(response);
+        riempioAzioni(response);
+        console.log(response)
+    })
+    rq.catch(function (err) {
+        if (err.response.status == 401) {
+            _lblErrore.show();
+        }
+        else
+            errore(err);
+    })
+
+    function riempioAzioni(response) {
+        for (let action of response.data) {
+            if (action.tipo == "irrigazione") {
+                modIrr = action.modalita;
+                _modalitaIrrigazione.text(modIrr.toUpperCase());
+
+                if (_modalitaIrrigazione.text() == "MANUALE") {
+                    if (action.acceso == false) {
+                        _btnStato.text("ACCENDI").css({ "background-color": "green", "border-color": "green" }).show();
+                    }
+                    else {
+                        _btnStato.text("SPEGNI").css({ "background-color": "red", "border-color": "red" }).show();
+                    }
+                    _tabAutomatico.hide();
+
+                }
+                else {
+                    _tabAutomatico.show();
+                    _btnStato.hide();
+                }
+            }
+        }
+    }
+
+    function aggiornoDb(modalita) {
+        let rq = inviaRichiesta("POST", "/api/aggiornamodalita", { "modalita": modalita });
+        rq.then(function (response) {
+            console.log(response);
+            if (modalita == "MANUALE") {
+                _tabAutomatico.hide();
+                _modalitaIrrigazione.text("MANUALE");
+                _btnStato.show();
+            }
+            else {
+                _modalitaIrrigazione.text("AUTOMATICO");
+                _tabAutomatico.show();
+                _btnStato.hide();
+            }
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    }
+
 
 
     function riempiCampi(response) {
@@ -110,14 +160,17 @@ $(document).ready(function () {
             if (item.tipo == "temperatura") {
                 let valoreTemperatura = item.valori[item.valori.length - 1].dato;
                 console.log(valoreTemperatura);
-                let length = valoreTemperatura.length;
                 _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
             }
             else if (item.tipo == "umiditaAria") {
                 let umiditaAria = item.valori[item.valori.length - 1].dato;
                 console.log(umiditaAria);
-                let length1 = umiditaAria.length;
                 _rilevamenti.children().eq(1).text(umiditaAria + "%");
+            }
+            else if (item.tipo == "umiditaTerra") {
+                let umiditaTerra = item.valori[item.valori.length - 1].dato;
+                console.log(umiditaTerra);
+                _rilevamenti.children().eq(2).text(umiditaTerra + "%");
             }
         }
 

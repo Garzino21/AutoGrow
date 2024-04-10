@@ -136,11 +136,10 @@ app.get("/api/inviadati", async (req, res, next) => {
         console.log("cristo:" + risposta[0].valori[(risposta[0].valori.length) - 2].data + "asdf" + date);
 
         if (risposta[0].valori[(risposta[0].valori.length) - 3].data != date) {    //date data di oggi
-            console.log("aggiorno storicoooooooooooooooooooooooooooooooooo");
+            console.log("aggiorno storico");
             //await aggiornaStorico(risposta, date, res, req); 
             //devo eliminare i dati vecchi da dati una volta che funziona
         }
-        console.log("se fossi negro vorrei essere bianco");
 
         for (let dato of risposta) {
             if (dato.tipo == "temperatura") {
@@ -176,7 +175,6 @@ app.get("/api/inviadati", async (req, res, next) => {
 });
 
 app.post("/api/prendidati", async (req, res, next) => {
-    let tipo = req["body"].tipo;
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("dati");
@@ -185,6 +183,28 @@ app.post("/api/prendidati", async (req, res, next) => {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 });
+
+app.post("/api/prendiazioni", async (req, res, next) => {
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("azioni");
+    let rq = collection.find({}).toArray();
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
+app.post("/api/aggiornamodalita", async (req, res, next) => {
+    let mod = req["body"].modalita;
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("azioni");
+    let rq = collection.updateOne({ tipo: 'irrigazione' }, { $set: { 'modalita': mod } });
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
 
 app.post("/api/prendiStorico", async (req, res, next) => {
     let tipo = req["body"].tipo;
