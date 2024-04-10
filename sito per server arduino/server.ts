@@ -138,7 +138,7 @@ app.get("/api/inviadati", async (req, res, next) => {
         if (risposta[0].valori[(risposta[0].valori.length) - 3].data != date) {    //date data di oggi
             console.log("aggiorno storico");
             //await aggiornaStorico(risposta, date, res, req); 
-            //devo eliminare i dati vecchi da dati una volta che funziona
+            //await eliminareDatiVecchi(risposta, date, res, req);
         }
 
         for (let dato of risposta) {
@@ -259,6 +259,22 @@ async function aggiungoTemperatura(temp: any, ora: any, res: any, date: any) {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
 }
 
+async function eliminareDatiVecchi(data: import("mongodb").WithId<import("bson").Document>[], date: string, res: any, req: any) {
+    for (let dato of data) {
+
+        const client = new MongoClient(connectionString);
+        await client.connect();
+        let collection = client.db(DBNAME).collection("storico");
+        let valori:never;
+        //aggiungo il dato
+        let rq = collection.updateMany({ tipo: 'temperatura'},{ $pull: {valori: valori} })
+        rq.then(async (data) => {
+            console.log("cancellato");
+        });
+        rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    }
+}
+
 async function aggiornaStorico(data: import("mongodb").WithId<import("bson").Document>[], date: string, res: any, req: any) {
     return new Promise(async (resolve, reject) => {
 
@@ -288,15 +304,15 @@ async function aggiornaStorico(data: import("mongodb").WithId<import("bson").Doc
 }
 
 async function aggiungoDatiStorico(campo: any, res: any, req: any, tipo: any) {
-        const client = new MongoClient(connectionString);
-        await client.connect();
-        let collection = client.db(DBNAME).collection("storico");
-        //aggiungo il dato
-        let rq = collection.insertOne(campo);
-        rq.then(async (data) => {
-            console.log("aggiunta: " + tipo);
-        });
-        rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("storico");
+    //aggiungo il dato
+    let rq = collection.insertOne(campo);
+    rq.then(async (data) => {
+        console.log("aggiunta: " + tipo);
+    });
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
 }
 
 

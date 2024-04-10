@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  delay(30000);
   client = collegaServer();
   inviaDati(client);
   delay(1000);
@@ -104,8 +104,8 @@ void inviaDati(WiFiClient client) {
   int h = humSens();
 
   String PATH_NAME = "/api/inviadati";
-  //String queryString = String("?temp=")+String(t)+String("&hum=")+String(h);
-  String queryString = String("?temp=22")+String("&hum=55");
+  String queryString = String("?temp=")+String(t)+String("&hum=")+String(h);
+  //String queryString = String("?temp=22")+String("&hum=55");
 
 
   client.println(HTTP_METHOD + " " + PATH_NAME + queryString + " HTTP/1.1");
