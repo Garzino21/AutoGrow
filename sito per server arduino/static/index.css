@@ -1,13 +1,11 @@
-html
-{
+html {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
 }
 
-body
-{
+body {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -19,7 +17,7 @@ body
   background-position: center;
 }
 
-provs{
+provs {
   background-color: rgb(53, 53, 53);
 
   background-image: url('img/background.png');
@@ -29,18 +27,17 @@ provs{
   background-position: center;
 }
 
-.videofullscreen{
+.videofullscreen {
   display: fixed;
-  position:fixed;
+  position: fixed;
   bottom: 0;
-  width:100% !important;
-  height:100% !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover;
   z-index: -100;
 }
 
-#container
-{
+#container {
   height: 100%;
   width: 100%;
   margin-top: 0;
@@ -48,8 +45,7 @@ provs{
   text-align: center;
 }
 
-#title
-{
+#title {
   color: rgb(144, 210, 126);
   font-size: 6em;
   font-weight: bold;
@@ -58,8 +54,7 @@ provs{
   display: block;
 }
 
-#subTitle
-{
+#subTitle {
   color: rgb(144, 210, 126);
   font-size: 3em;
   font-weight: bold;
@@ -67,12 +62,11 @@ provs{
   display: block;
 }
 
-.button
-{
+.button {
   display: inline-block;
   width: 180px;
   height: 60px;
-  border: 5px solid rgb(60, 123, 42);  
+  border: 5px solid rgb(60, 123, 42);
   background-color: rgb(60, 123, 42);
   color: rgb(144, 210, 126);
   font-size: 2em;
@@ -80,8 +74,7 @@ provs{
   border-radius: 25px;
 }
 
-#indietro
-{
+#indietro {
   padding-bottom: 53px;
   width: 60px;
   height: 40px;
@@ -91,28 +84,24 @@ provs{
   top: 0;
 }
 
-#progetto
-{
+#progetto {
   margin-top: 10%;
   color: white;
   font-size: 1.5em;
 }
 
-.textImage
-{
+.textImage {
   display: inline-block;
   width: 100%;
   height: 500px;
   margin-bottom: 3%;
 }
 
-#paginaIniziale
-{
+#paginaIniziale {
   background-color: transparent;
 }
 
-.application
-{
+.application {
   text-align: center;
   margin-top: 10%;
   display: block;
@@ -123,15 +112,13 @@ provs{
   width: 100%;
 }
 
-#intestazione
-{
+#intestazione {
   color: black;
   margin-top: 5%;
   display: block;
 }
 
-#rilevamenti
-{
+#rilevamenti {
   background-color: transparent;
   margin-top: 2%;
   margin-bottom: 2%;
@@ -141,40 +128,34 @@ provs{
   width: 100%;
 }
 
-#rilevamenti :nth-child(1)
-{
+#rilevamenti :nth-child(1) {
   float: left;
 }
 
-#rilevamenti :nth-child(4) 
-{
+#rilevamenti :nth-child(4) {
   float: right;
 }
 
-#rilevamenti :nth-child(2) 
-{
+#rilevamenti :nth-child(2) {
   margin-right: 1%;
 }
 
-#rilevamenti div
-{
-  padding-top:  20px ;
+#rilevamenti div {
+  padding-top: 20px;
   font-weight: bold;
   font-size: 2em;
   border-radius: 25px;
   background-color: rgb(109, 137, 102);
   height: 100px;
   width: 24%;
-
   display: inline-block;
 }
 
-#paginaDati{
+#paginaDati {
   height: fit-content;
 }
 
-#parametri
-{
+#parametri {
   background-color: transparent;
   display: inline-block;
   border-radius: 25px;
@@ -182,8 +163,7 @@ provs{
   width: 100%;
 }
 
-#parametri .div
-{
+#parametri .div {
   display: inline-block;
   border-radius: 25px;
   background-color: rgb(109, 137, 102);
@@ -193,28 +173,25 @@ provs{
 }
 
 
-.paramTitolo
-{
+.paramTitolo {
   margin-top: 5%;
-  color:  rgb(109, 137, 102);
+  color: rgb(109, 137, 102);
   display: inline-block;
   text-align: center;
   width: 100%;
   height: 40px;
   font-size: 1.8em;
-  font-weight: bold;  
+  font-weight: bold;
 }
 
-.cont
-{
+.cont {
   height: 100%;
   padding-top: 20px;
   padding-bottom: 20px;
-  font-weight: bold;  
+  font-weight: bold;
 }
 
-#pTitolo
-{
+#pTitolo {
   position: absolute;
   float: right;
   font-size: 2em;
@@ -222,35 +199,51 @@ provs{
   margin-bottom: 2%;
 }
 
-#myChart
-{
+#myChart {
   margin: 1%;
   width: 90%;
   height: 90%;
 }
 
-#contenitoreCanvas
-{
+#contenitoreCanvas {
   display: inline-block;
   width: 100%;
   height: 100%;
   border-radius: 25px;
   background-color: white;
-} 
+}
 
-table
-{
+table {
   width: 80%;
   margin: 0 auto;
 }
 
-td
-{
+td {
   border: 2px solid black;
 }
 
-.button:hover{
+.button:hover {
   cursor: pointer;
 }
 
+#selectStorico{
+  border: 0;
+  margin-top: 10px;
+  margin-left: 2.5%;
+  border-radius: 25px;
+  text-align: center;
+  width: 150px;
+  height: 30px;
+  font-size: 13pt;
+  float: left;
+  font-weight: bold;
+}
 
+#selectStorico:hover{
+  border: 3px solid rgb(109, 137, 102);;
+}
+
+#selectStorico option{
+  background-color: rgb(109, 137, 102);
+  color: white;
+}

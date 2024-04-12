@@ -1,4 +1,4 @@
-"use strict"
+
 $(document).ready(function () {
 
     //variabili
@@ -14,6 +14,10 @@ $(document).ready(function () {
     let _tabAutomatico = $("#tabAutomatico");
     let _btnStato = $("#btnStato");
     let modIrr = "";
+    let _selectStorico = $("#selectStorico");
+    let myChartix;
+
+    const ctx = $("#myChart");
 
 
     //impostazioni di avvio
@@ -73,14 +77,68 @@ $(document).ready(function () {
         }
     });
 
+    _selectStorico.on("change", function () {
+        myChartix.destroy();
+        let rq = inviaRichiesta("POST", "/api/prendiStorico")
+        rq.then(function (response) {
+            creaChart(response);
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    })
+
     //prendo dati dal db
+    //prendo le date dello storico per vedere se posso usare la select o no
+    let dateStorico = [];
+    let rq = inviaRichiesta("POST", "/api/prendiStorico")
+    rq.then(function (response) {
+        console.log(response);
+        let vediDataUguale;
+        for (let item of response.data) {
+            if (vediDataUguale != item.data) {
+                dateStorico.push(item.data);
+                vediDataUguale = item.data;
+            }
+        }
+        if (dateStorico.length == 0) {
+            _selectStorico.hide();
+        }
+        else {
+            for (let item of dateStorico) {
+                if (item == new Date().toLocaleDateString()) 
+                {
+                    $("<option>").text("Ieri").val(item).appendTo(_selectStorico);
+                }
+                else
+                {
+                    $("<option>").text(item).val(item).appendTo(_selectStorico);
+                }
+            }
+            _selectStorico.prop("selectedIndex", -1);
+        }
+    })
+    rq.catch(function (err) {
+        if (err.response.status == 401) {
+            _lblErrore.show();
+        }
+        else
+            errore(err);
+    })
+
+
+
+    //prendo dati per il grafico
     let tipo = "temperatura";
-    let rq = inviaRichiesta("POST", "/api/prendidati")
+    rq = inviaRichiesta("POST", "/api/prendidati")
     rq.then(function (response) {
         //controlloData(response);
         creaChart(response);
         riempiCampi(response);
-        console.log(response)
     })
     rq.catch(function (err) {
         if (err.response.status == 401) {
@@ -156,31 +214,31 @@ $(document).ready(function () {
 
 
     function riempiCampi(response) {
+        let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
         for (let item of response.data) {
             if (item.tipo == "temperatura") {
                 let valoreTemperatura = item.valori[item.valori.length - 1].dato;
                 console.log(valoreTemperatura);
                 _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
+                $("<span>").text("TEMPERATURA").appendTo(_rilevamenti.children().eq(0)).css(stile)
             }
             else if (item.tipo == "umiditaAria") {
                 let umiditaAria = item.valori[item.valori.length - 1].dato;
                 console.log(umiditaAria);
                 _rilevamenti.children().eq(1).text(umiditaAria + "%");
+                $("<span>").text("HUM ARIA").appendTo(_rilevamenti.children().eq(1)).css(stile)
             }
             else if (item.tipo == "umiditaTerra") {
                 let umiditaTerra = item.valori[item.valori.length - 1].dato;
                 console.log(umiditaTerra);
                 _rilevamenti.children().eq(2).text(umiditaTerra + "%");
+                $("<span>").text("HUM TERRA").appendTo(_rilevamenti.children().eq(2)).css(stile)
             }
         }
-
-
-
     }
 
     function creaChart(response) {
         let data = [];
-
         let valoreTemperatura = [];
         let umiditaAria = [];
 
@@ -200,8 +258,6 @@ $(document).ready(function () {
             }
         }
 
-
-
         console.log(valoreTemperatura, data);
 
         //se i dati sono più di 12 li taglio
@@ -214,11 +270,8 @@ $(document).ready(function () {
         if (data.length > 12) {
             data = data.slice(data.length - 12);
         }
-        const ctx = $("#myChart")
 
-        //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
-
-        new Chart(ctx, {
+        let config = {
             type: 'line',
             data: {
                 labels: data,
@@ -243,8 +296,10 @@ $(document).ready(function () {
                 },
 
             }
-        });
+        };
+        myChartix = new Chart(ctx, config);
 
+        //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
     }
 
 

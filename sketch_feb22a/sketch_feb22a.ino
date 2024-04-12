@@ -11,18 +11,20 @@
 
 DHT dht(2, DHT11);
 
-//const char ssid[] = "Rete davide";
-//const char pass[] = "davidealessia";
-const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
-const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
+//WebSocket client will connect to websocket.org using port 4567
+
+const char ssid[] = "Rete davide";
+const char pass[] = "davidealessia";
+//const char ssid[] = "Wadsl-Garzino";  // change your network SSID (name)
+//const char pass[] = "mafizama76";   // change your network password (use for WPA, or use as key for WEP)
 
 //http in lan locale
 WiFiClient client;
 int status = WL_IDLE_STATUS;
 int HTTP_PORT = 80;
 String HTTP_METHOD = "GET";  // or POST
-//char HOST_NAME[] = "192.168.43.23";
-char HOST_NAME[] = "192.168.1.32";// dove gira il server
+char HOST_NAME[] = "192.168.43.23";
+//char HOST_NAME[] = "192.168.1.32";// dove gira il server
 
 int contatore = 0;
 

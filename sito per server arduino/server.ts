@@ -207,10 +207,9 @@ app.post("/api/aggiornamodalita", async (req, res, next) => {
 
 
 app.post("/api/prendiStorico", async (req, res, next) => {
-    let tipo = req["body"].tipo;
     const client = new MongoClient(connectionString);
     await client.connect();
-    let collection = client.db(DBNAME).collection("dati");
+    let collection = client.db(DBNAME).collection("storico");
     let rq = collection.find({}).toArray();
     rq.then((data) => res.send(data));
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
