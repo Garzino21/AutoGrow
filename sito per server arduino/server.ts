@@ -133,40 +133,49 @@ app.get("/api/inviadati", async (req, res, next) => {
         let aggiungiT: boolean = false;
         let aggiungiH: boolean = false;
 
-        console.log("cristo:" + risposta[0].valori[(risposta[0].valori.length) - 2].data + "asdf" + date);
-
-        if (risposta[0].valori[(risposta[0].valori.length) - 3].data != date) {    //date data di oggi
-            console.log("aggiorno storico");
-            //await aggiornaStorico(risposta, date, res, req); 
-            //await eliminareDatiVecchi(risposta, date, res, req);
-        }
-
-        for (let dato of risposta) {
-            if (dato.tipo == "temperatura") {
-                if (dato.valori[dato.valori.length - 1].dato == temp)
-                    aggiungiT = false;
-                else
-                    aggiungiT = true;
-
+        if(risposta[1].valori!="")
+        {
+            console.log("-------------------------------------------------------------------------------------");
+            if (risposta[1].valori[(risposta[1].valori.length) - 1].data != date) {    //date data di oggi
+                console.log("aggiorno storico");
+                //await aggiornaStorico(risposta, date, res, req); 
+                //await eliminareDatiVecchi(risposta, date, res, req);
             }
-            else if (dato.tipo == "umiditaAria") {
-                if (dato.valori[dato.valori.length - 1].dato == hum)
-                    aggiungiH = false;
-                else
-                    aggiungiH = true;
+    
+            for (let dato of risposta) {
+                if (dato.tipo == "temperatura") {
+                    if (dato.valori[dato.valori.length - 1].dato == temp)
+                        aggiungiT = false;
+                    else
+                        aggiungiT = true;
+    
+                }
+                else if (dato.tipo == "umiditaAria") {
+                    if (dato.valori[dato.valori.length - 1].dato == hum)
+                        aggiungiH = false;
+                    else
+                        aggiungiH = true;
+                }
+            }
+    
+    
+            if (aggiungiT || aggiungiH) {
+                await aggiungoTemperatura(temp, ora, res, date);
+                await aggiungoUmidita(hum, ora, res, date);
+                res.send("aggiunto");
+            }
+            else {
+                console.log("dati uguali");
+                res.send("dati uguali");
             }
         }
-
-
-        if (aggiungiT || aggiungiH) {
+        else
+        {
             await aggiungoTemperatura(temp, ora, res, date);
             await aggiungoUmidita(hum, ora, res, date);
             res.send("aggiunto");
         }
-        else {
-            console.log("dati uguali");
-            res.send("dati uguali");
-        }
+       
 
     });
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
@@ -260,13 +269,12 @@ async function aggiungoTemperatura(temp: any, ora: any, res: any, date: any) {
 
 async function eliminareDatiVecchi(data: import("mongodb").WithId<import("bson").Document>[], date: string, res: any, req: any) {
     for (let dato of data) {
-
         const client = new MongoClient(connectionString);
         await client.connect();
-        let collection = client.db(DBNAME).collection("storico");
+        let collection = client.db(DBNAME).collection("dati");
         let valori:never;
         //aggiungo il dato
-        let rq = collection.updateMany({ tipo: 'temperatura'},{ $pull: {valori: valori} })
+        let rq = collection.updateMany({},{ $set: {valori: []} })
         rq.then(async (data) => {
             console.log("cancellato");
         });

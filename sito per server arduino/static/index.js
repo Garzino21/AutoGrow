@@ -1,6 +1,10 @@
+//fare in modo che quando clicco sul cancella grafico della temperatura 
+//mi aggiorni il grafico con i dati dell'umidità messi in centro al grafico
+
+// fare una navigation bar in alto per tutte le pagine
 
 $(document).ready(function () {
-
+    let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
     //variabili
     let _apri = $("#apri");
     let _paginaIniziale = $("#paginaIniziale");
@@ -16,10 +20,27 @@ $(document).ready(function () {
     let modIrr = "";
     let _selectStorico = $("#selectStorico");
     let myChartix;
+    let _divMeteo = $("#divMeteo");
+    let _navBar = $(".navb"); 
+
+    _navBar.hide();
+    _divMeteo.hide();
+
 
     const ctx = $("#myChart");
 
+    //RIQUADRO ORARIO
 
+    setInterval(function () {
+        let spann=$("<span>").text("").appendTo(_rilevamenti.children().eq(3)).css(stile)
+        let hours = new Date().getHours();
+        let minutes = new Date().getMinutes();
+        let seconds = new Date().getSeconds();
+        let oraAttuale = hours + ":" + minutes + ":" + seconds;
+        _rilevamenti.children().eq(3).text(oraAttuale);
+        spann=$("<span>").text("ORA ATTUALE").appendTo(_rilevamenti.children().eq(3)).css(stile)
+    }, 1000);
+    
     //impostazioni di avvio
     _paginaIniziale.show().css("margin-top", "flex");
     _paginaDati.hide();
@@ -32,10 +53,12 @@ $(document).ready(function () {
     _apri.on("click", function () {
         _paginaIniziale.hide();
         _paginaDati.show();
+        _divMeteo.show();
         _info.hide();
         _apri.hide();
         _indietro.show();
-        _body.css("overflow", "scroll");
+        _body.css("overflow-y", "scroll");
+        _navBar.show();
     });
 
     _info.on("click", function () {
@@ -43,6 +66,7 @@ $(document).ready(function () {
         _paginaIniziale.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
+        _navBar.show();
     })
 
     _indietro.on("click", function () {
@@ -51,8 +75,10 @@ $(document).ready(function () {
         _progetto.hide();
         _info.show();
         _apri.show();
+        _divMeteo.hide();
         _indietro.hide();
         _body.css("overflow", "hidden");
+        _navBar.hide();
     })
 
     _modalitaIrrigazione.on("click", function () {
@@ -109,17 +135,15 @@ $(document).ready(function () {
             _selectStorico.hide();
         }
         else {
+            $("<option>").text("---Seleziona una data---").val("seleziona").appendTo(_selectStorico);
             for (let item of dateStorico) {
-                if (item == new Date().toLocaleDateString()) 
-                {
+                if (item == new Date().toLocaleDateString() - 1) {
                     $("<option>").text("Ieri").val(item).appendTo(_selectStorico);
                 }
-                else
-                {
+                else {
                     $("<option>").text(item).val(item).appendTo(_selectStorico);
                 }
             }
-            _selectStorico.prop("selectedIndex", -1);
         }
     })
     rq.catch(function (err) {
@@ -214,7 +238,6 @@ $(document).ready(function () {
 
 
     function riempiCampi(response) {
-        let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
         for (let item of response.data) {
             if (item.tipo == "temperatura") {
                 let valoreTemperatura = item.valori[item.valori.length - 1].dato;
@@ -228,12 +251,12 @@ $(document).ready(function () {
                 _rilevamenti.children().eq(1).text(umiditaAria + "%");
                 $("<span>").text("HUM ARIA").appendTo(_rilevamenti.children().eq(1)).css(stile)
             }
-            else if (item.tipo == "umiditaTerra") {
+            /*else if (item.tipo == "umiditaTerra") {
                 let umiditaTerra = item.valori[item.valori.length - 1].dato;
                 console.log(umiditaTerra);
                 _rilevamenti.children().eq(2).text(umiditaTerra + "%");
                 $("<span>").text("HUM TERRA").appendTo(_rilevamenti.children().eq(2)).css(stile)
-            }
+            }*/
         }
     }
 

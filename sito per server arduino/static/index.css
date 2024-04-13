@@ -1,26 +1,17 @@
 html {
-  height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
 }
 
 body {
-  height: 100%;
-  width: 100%;
+  padding-top: 120px;
+  width: 100dvw;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  display: flex;
+  position: relative;
   margin: 0;
-  overflow: hidden;
   background-image: url('img/forest.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
-}
-
-provs {
-  background-color: rgb(53, 53, 53);
-
-  background-image: url('img/background.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -45,12 +36,17 @@ provs {
   text-align: center;
 }
 
+.container {
+  margin-block: auto;
+  margin-top: 5%;
+}
+
 #title {
   color: rgb(144, 210, 126);
   font-size: 6em;
   font-weight: bold;
   text-align: center;
-  margin-top: 10%;
+  /* margin-top: 10%; */
   display: block;
 }
 
@@ -79,7 +75,7 @@ provs {
   width: 60px;
   height: 40px;
   margin: 2%;
-  position: fixed;
+  position: absolute;
   display: inline-block;
   top: 0;
 }
@@ -99,6 +95,7 @@ provs {
 
 #paginaIniziale {
   background-color: transparent;
+  margin-top: 2%;
 }
 
 .application {
@@ -114,7 +111,7 @@ provs {
 
 #intestazione {
   color: black;
-  margin-top: 5%;
+  /* margin-top: 5%;*/
   display: block;
 }
 
@@ -153,6 +150,8 @@ provs {
 
 #paginaDati {
   height: fit-content;
+  margin-bottom: 2rem;
+  margin-top: 5%;
 }
 
 #parametri {
@@ -229,13 +228,11 @@ td {
 #selectStorico{
   border: 0;
   margin-top: 10px;
-  margin-left: 2.5%;
   border-radius: 25px;
   text-align: center;
-  width: 150px;
+  width: 80%;
   height: 30px;
   font-size: 13pt;
-  float: left;
   font-weight: bold;
 }
 
@@ -247,3 +244,38 @@ td {
   background-color: rgb(109, 137, 102);
   color: white;
 }
+
+#divMeteo{
+  width: 250px;
+  text-align: center;
+  height: 150px;
+  position: absolute;
+  border-radius: 25px;
+  border: 1px solid rgb(173, 201, 165);
+  background-color: rgb(173, 201, 165);
+  color: black;
+  margin: 2%;
+  margin-right: 3%;
+  display: fixed;
+  top: 0;
+  right: 0;
+}
+
+.navb {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+nav{
+  background-color: rgb(173, 201, 165);
+  height: 70px;
+  position: fixed;
+  top: 0; 
+}
+
+.bg-green{
+  background-color:  rgb(173, 201, 165);
+}
+
+/* MEDIA QUERIES */
