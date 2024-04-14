@@ -6,11 +6,9 @@
 $(document).ready(function () {
     let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
     //variabili
-    let _apri = $("#apri");
     let _paginaIniziale = $("#paginaIniziale");
     let _paginaDati = $("#paginaDati");
     let _progetto = $("#progetto");
-    let _info = $("#info");
     let _body = $("body");
     let _indietro = $("#indietro");
     let _rilevamenti = $("#rilevamenti");
@@ -21,10 +19,13 @@ $(document).ready(function () {
     let _selectStorico = $("#selectStorico");
     let myChartix;
     let _divMeteo = $("#divMeteo");
-    let _navBar = $(".navb"); 
+    let _navBar = $(".navb");
+    let _monitora = $(".monitora");
+    let _prog = $(".prog");
+    let _home = $(".home");
+    let _meteo = $("#meteo");
 
     _navBar.hide();
-    _divMeteo.hide();
 
 
     const ctx = $("#myChart");
@@ -32,53 +33,57 @@ $(document).ready(function () {
     //RIQUADRO ORARIO
 
     setInterval(function () {
-        let spann=$("<span>").text("").appendTo(_rilevamenti.children().eq(3)).css(stile)
+        let spann = $("<span>").text("").appendTo(_rilevamenti.children().eq(3)).css(stile)
         let hours = new Date().getHours();
         let minutes = new Date().getMinutes();
         let seconds = new Date().getSeconds();
         let oraAttuale = hours + ":" + minutes + ":" + seconds;
         _rilevamenti.children().eq(3).text(oraAttuale);
-        spann=$("<span>").text("ORA ATTUALE").appendTo(_rilevamenti.children().eq(3)).css(stile)
+        spann = $("<span>").text("ORA ATTUALE").appendTo(_rilevamenti.children().eq(3)).css(stile)
     }, 1000);
-    
+
     //impostazioni di avvio
     _paginaIniziale.show().css("margin-top", "flex");
     _paginaDati.hide();
     _progetto.hide();
-    _indietro.hide();
-
     _btnStato.hide();
 
     //gestione eventi
-    _apri.on("click", function () {
+
+
+
+    _monitora.on("click", function () {
         _paginaIniziale.hide();
+        _progetto.hide();
         _paginaDati.show();
-        _divMeteo.show();
-        _info.hide();
-        _apri.hide();
-        _indietro.show();
         _body.css("overflow-y", "scroll");
         _navBar.show();
+        _monitora.addClass("active");
+        _prog.removeClass("active");
+        _home.removeClass("active");
     });
 
-    _info.on("click", function () {
+    _prog.on("click", function () {
         _progetto.show();
         _paginaIniziale.hide();
+        _paginaDati.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
         _navBar.show();
+        _prog.addClass("active");
+        _monitora.removeClass("active");
+        _home.removeClass("active");
     })
 
-    _indietro.on("click", function () {
+    _home.on("click", function () {
         _paginaIniziale.show();
         _paginaDati.hide();
         _progetto.hide();
-        _info.show();
-        _apri.show();
-        _divMeteo.hide();
-        _indietro.hide();
         _body.css("overflow", "hidden");
         _navBar.hide();
+        _home.addClass("active");
+        _prog.removeClass("active");
+        _monitora.removeClass("active");
     })
 
     _modalitaIrrigazione.on("click", function () {
@@ -105,23 +110,53 @@ $(document).ready(function () {
 
     _selectStorico.on("change", function () {
         myChartix.destroy();
-        let rq = inviaRichiesta("POST", "/api/prendiStorico")
-        rq.then(function (response) {
-            creaChart(response);
-        })
-        rq.catch(function (err) {
-            if (err.response.status == 401) {
-                _lblErrore.show();
-            }
-            else
-                errore(err);
-        })
+        if (_selectStorico.val() == new Date().toLocaleDateString()) {
+            let rq = inviaRichiesta("POST", "/api/prendidati")
+            rq.then(function (response) {
+                creaChart(response);
+            })
+            rq.catch(function (err) {
+                if (err.response.status == 401) {
+                    _lblErrore.show();
+                }
+                else
+                    errore(err);
+            })
+        }
+        else {
+
+            let rq = inviaRichiesta("POST", "/api/prendiStorico")
+            rq.then(function (response) {
+                creaChart(response);
+            })
+            rq.catch(function (err) {
+                if (err.response.status == 401) {
+                    _lblErrore.show();
+                }
+                else
+                    errore(err);
+            })
+        }
     })
 
     //prendo dati dal db
+    //prendo il meteo
+    let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=precipitation&timezone=Europe%2FBerlin")
+    rq.then(function (response) {
+        datiAttuali(response);
+    })
+    rq.catch(function (err) {
+        if (err.response.status == 401) {
+            _lblErrore.show();
+        }
+        else
+            errore(err);
+    })
+
+
     //prendo le date dello storico per vedere se posso usare la select o no
     let dateStorico = [];
-    let rq = inviaRichiesta("POST", "/api/prendiStorico")
+    rq = inviaRichiesta("POST", "/api/prendiStorico")
     rq.then(function (response) {
         console.log(response);
         let vediDataUguale;
@@ -135,13 +170,13 @@ $(document).ready(function () {
             _selectStorico.hide();
         }
         else {
-            $("<option>").text("---Seleziona una data---").val("seleziona").appendTo(_selectStorico);
+            $("<option>").text("---Dati di oggi---").val(new Date().toLocaleDateString()).appendTo(_selectStorico);
             for (let item of dateStorico) {
                 if (item == new Date().toLocaleDateString() - 1) {
-                    $("<option>").text("Ieri").val(item).appendTo(_selectStorico);
+                    $("<option>").text("Dati di ieri").val(item).appendTo(_selectStorico);
                 }
                 else {
-                    $("<option>").text(item).val(item).appendTo(_selectStorico);
+                    $("<option>").text("Dati del " + item).val(item).appendTo(_selectStorico);
                 }
             }
         }
@@ -323,6 +358,25 @@ $(document).ready(function () {
         myChartix = new Chart(ctx, config);
 
         //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
+    }
+
+    function datiAttuali(response) {
+        let time = [];
+        let precipitazioni = [];
+
+        for (let i = 0; i < 23; i++) {
+            time.push(response.data.hourly.time[i]);
+            precipitazioni.push(response.data.hourly.precipitation[i]);
+        }
+
+        let oraAttuale = new Date().getHours();
+
+        if (precipitazioni[oraAttuale] > 0) {
+            _meteo.text("Pioggia");
+        }
+        else if (precipitazioni[oraAttuale] == 0) {
+            _meteo.text("Sole");
+        }
     }
 
 

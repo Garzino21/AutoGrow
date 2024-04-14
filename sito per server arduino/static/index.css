@@ -70,16 +70,6 @@ body {
   border-radius: 25px;
 }
 
-#indietro {
-  padding-bottom: 53px;
-  width: 60px;
-  height: 40px;
-  margin: 2%;
-  position: absolute;
-  display: inline-block;
-  top: 0;
-}
-
 #progetto {
   margin-top: 10%;
   color: white;
@@ -237,7 +227,7 @@ td {
 }
 
 #selectStorico:hover{
-  border: 3px solid rgb(109, 137, 102);;
+  border: 3px solid rgb(109, 137, 102);
 }
 
 #selectStorico option{
@@ -245,26 +235,11 @@ td {
   color: white;
 }
 
-#divMeteo{
-  width: 250px;
-  text-align: center;
-  height: 150px;
-  position: absolute;
-  border-radius: 25px;
-  border: 1px solid rgb(173, 201, 165);
-  background-color: rgb(173, 201, 165);
-  color: black;
-  margin: 2%;
-  margin-right: 3%;
-  display: fixed;
-  top: 0;
-  right: 0;
-}
-
 .navb {
   position: fixed;
   top: 0;
   width: 100%;
+  height: auto;
 }
 
 nav{
@@ -277,5 +252,9 @@ nav{
 .bg-green{
   background-color:  rgb(173, 201, 165);
 }
+
+#meteo{
+  float: right;
+} 
 
 /* MEDIA QUERIES */
