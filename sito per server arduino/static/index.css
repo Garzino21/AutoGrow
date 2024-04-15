@@ -260,6 +260,19 @@ nav{
   width: 48px;
   height: 48px;
 }
+
+#tabMeteo{
+  height: 100px;
+}
+
+#tabMeteo td{
+  border: 0;
+}
+
+
+
+
+
 /* MEDIA QUERIES */
 
 @media screen and (max-width: 991px) {
@@ -268,4 +281,7 @@ nav{
     width: 0;
     height: 0;
   }
+}
+
+@media screen and (max-width: 800px) {
 }

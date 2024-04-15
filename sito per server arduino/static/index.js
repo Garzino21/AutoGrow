@@ -25,9 +25,11 @@ $(document).ready(function () {
     let _meteo = $("#meteo");
     let _intestazione = $("#intestazione");
     let _title = $("#title");
+    let _aggiungiMeteo = $("#aggiungiMeteo");
+    let _tbody = $("#tbody");
+    let _thead = $("#thead");
 
     _navBar.hide();
-
 
     const ctx = $("#myChart");
 
@@ -58,12 +60,11 @@ $(document).ready(function () {
 
     //gestione eventi
     _meteo.on("click", function () {
-        swal({
-            title: "Meteo",
-            text: "Meteo di oggi",
-            icon: "img/nuvola.png",
-            button: "OK",
-        });
+        Swal.fire({
+            title: "<i>Meteo di oggi</i>", 
+            html: `<img src='${_meteo.prop("src")}' style='width: 100px; height: 100px;'>`,  
+            confirmButtonText: "OK", 
+          });
     });
 
 
@@ -116,11 +117,11 @@ $(document).ready(function () {
     _btnStato.on("click", function () {
         if (_btnStato.text() == "ACCENDI") {
             _btnStato.text("SPEGNI").css({ "background-color": "red", "border-color": "red" });
-            swal("HAI ACCESO L'IRRIGAZIONE", "", "success");
+            Swal.fire("HAI ACCESO L'IRRIGAZIONE", "", "success");
         }
         else {
             _btnStato.text("ACCENDI").css({ "background-color": "green", "border-color": "green" });;
-            swal("HAI SPENTO L'IRRIGAZIONE", "", "success");
+            Swal.fire("HAI SPENTO L'IRRIGAZIONE", "", "success");
         }
     });
 
@@ -157,17 +158,9 @@ $(document).ready(function () {
 
     //prendo dati dal db
     //prendo il meteo
-    let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&timezone=Europe%2FBerlin")
-    rq.then(function (response) {
-        datiAttuali(response);
-    })
-    rq.catch(function (err) {
-        if (err.response.status == 401) {
-            _lblErrore.show();
-        }
-        else
-            errore(err);
-    })
+
+    meteoOggi();
+    meteoSettimana();
 
 
     //prendo le date dello storico per vedere se posso usare la select o no
@@ -421,6 +414,125 @@ $(document).ready(function () {
                 }
             }
         }
+    }
+
+    function datiSettimana(response) {
+        let day = [];
+        let precipitazioni = [];
+        let tMax = [];
+        let tMin = [];
+
+        for (let i = 0; i < 7; i++) {
+            day.push(response.data.daily.time[i]);
+            precipitazioni.push(response.data.daily.precipitation_sum[i]);
+            tMax.push(response.data.daily.temperature_2m_max[i]);
+            tMin.push(response.data.daily.temperature_2m_min[i]);
+        }
+
+        let oggi = new Date().toLocaleDateString();
+
+        for (let i = 0; i < 7; i++) {
+
+            let td = $("<td>").appendTo(_tbody.children().eq(0)).val(day[i]).on("click", function () {
+            });
+
+            if (precipitazioni[i] > 15) {
+                $("<img>").prop("src", "img/pioggiaForte.png").appendTo(td);
+            }
+            else if (precipitazioni[i] > 2 && precipitazioni[i] <= 15) {
+                $("<img>").prop("src", "img/pioggiaLeggera.png").appendTo(td);
+            }
+            else if (precipitazioni[i] > 0 && precipitazioni[i] <= 2) {
+                $("<img>").prop("src", "img/nuvola.png").appendTo(td);
+            }
+            else if (precipitazioni[i] == 0) {
+                $("<img>").prop("src", "img/sole.png").appendTo(td);
+            }
+
+            td = $("<td>").text(tMin[i] + "° - ").appendTo(_tbody.children().eq(1)).css("color", "blue");
+            $("<span>").text(tMax[i] + "°").appendTo(td).css("color", "red");
+
+            //metto giorno della settimana
+
+        }
+
+        let dayName = new Date().toDateString();
+        let giorniTotali = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        dayName = dayName.split(" ");
+        dayName = dayName[0];
+        let giorniOrdinati = [];
+
+        for (let i = 0; i < 7; i++) {
+            if (dayName == giorniTotali[i]) {
+                giorniOrdinati.push(giorniTotali[i]);
+                for (let j = i + 1; j < 7; j++) {
+                    giorniOrdinati.push(giorniTotali[j]);
+                }
+                for (let j = 0; j < i; j++) {
+                    giorniOrdinati.push(giorniTotali[j]);
+                }
+            }
+        }
+
+        console.log(giorniOrdinati);
+
+        for (let giorn of giorniOrdinati) {
+            switch (giorn) {
+                case "Sun":
+                    giorn = "Domenica";
+                    break;
+                case "Mon":
+                    giorn = "Lunedì";
+                    break;
+                case "Tue":
+                    giorn = "Martedì";
+                    break;
+                case "Wed":
+                    giorn = "Mercoledì";
+                    break;
+                case "Thu":
+                    giorn = "Giovedì";
+                    break;
+                case "Fri":
+                    giorn = "Venerdì";
+                    break;
+                case "Sat":
+                    giorn = "Sabato";
+                    break;
+            }
+
+            $("<td>").text(giorn).appendTo(_thead.children().eq(0));
+        }
+
+
+    }
+
+    function meteoSettimana() {
+        rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&daily=temperature_2m_max&daily=temperature_2m_min&daily=precipitation_sum&timezone=Europe%2FBerlin")
+        rq.then(function (response) {
+            datiSettimana(response);
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    }
+
+    function meteoOggi() {
+        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&timezone=Europe%2FBerlin")
+        rq.then(function (response) {
+            datiAttuali(response);
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
     }
 
 
