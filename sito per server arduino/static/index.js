@@ -60,11 +60,11 @@ $(document).ready(function () {
 
     //gestione eventi
     _meteo.on("click", function () {
-        // Swal.fire({
-        //     title: "<i>Meteo di oggi</i>", 
-        //     html: `<img src='${_meteo.prop("src")}' style='width: 100px; height: 100px;'>`,  
-        //     confirmButtonText: "OK", 
-        //   });
+        Swal.fire({
+            title: "<i>Meteo di oggi</i>",
+            html: `<img src='${_meteo.prop("src")}' style='width: 100px; height: 100px;'>`,
+            confirmButtonText: "OK",
+        });
     });
 
 
@@ -383,6 +383,7 @@ $(document).ready(function () {
         }
 
         let oraAttuale = new Date().getHours();
+        _meteo.val(new Date().toLocaleDateString());
 
         if (precipitazioni[oraAttuale] > 2) {
             _meteo.prop("src", "img/pioggiaForte.png");
@@ -563,7 +564,7 @@ $(document).ready(function () {
         console.log(giornoScelto, giornoOggi);
 
         let delay = giornoScelto - giornoOggi;
-        let oreDiff = (delay * 24)-(delay*1);
+        let oreDiff = (delay * 24) - (delay * 1);
 
         console.log(oreDiff);
 
@@ -589,14 +590,14 @@ $(document).ready(function () {
                     imgs += "<td><img src='img/pioggiaLeggera.png'></td>";
                 }
                 else if (prec >= 0 && prec < 1) {
-                    console.log("nuv"+nuvole[index], index);
+                    console.log("nuv" + nuvole[index], index);
                     if (nuvole[index] >= 40 && nuvole[index] < 70) {
                         imgs += "<td><img src='img/mezzaNuvola.png'></td>";
                     }
                     else if (nuvole[index] >= 70) {
                         imgs += "<td><img src='img/nuvola.png'></td>";
                     }
-                    else if (nuvole[index] < 40){
+                    else if (nuvole[index] < 40) {
                         imgs += "<td><img src='img/sole.png'></td>";
                     }
                 }
