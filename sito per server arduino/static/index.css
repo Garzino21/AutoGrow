@@ -256,5 +256,16 @@ nav{
 #meteo{
   float: right;
 } 
-
+#contMeteo{
+  width: 48px;
+  height: 48px;
+}
 /* MEDIA QUERIES */
+
+@media screen and (max-width: 991px) {
+  #meteo{
+    float: left;
+    width: 0;
+    height: 0;
+  }
+}

@@ -1,7 +1,7 @@
-//fare in modo che quando clicco sul cancella grafico della temperatura 
-//mi aggiorni il grafico con i dati dell'umidità messi in centro al grafico
+//migliorare il meteo problema icona nell menu hamburger
+//click sul meteo vedere tutta la settimana in swal con le icone
 
-// fare una navigation bar in alto per tutte le pagine
+//icone https://icons8.it/icon/set/meteo/fluency
 
 $(document).ready(function () {
     let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
@@ -18,12 +18,13 @@ $(document).ready(function () {
     let modIrr = "";
     let _selectStorico = $("#selectStorico");
     let myChartix;
-    let _divMeteo = $("#divMeteo");
     let _navBar = $(".navb");
     let _monitora = $(".monitora");
     let _prog = $(".prog");
     let _home = $(".home");
     let _meteo = $("#meteo");
+    let _intestazione = $("#intestazione");
+    let _title = $("#title");
 
     _navBar.hide();
 
@@ -37,6 +38,13 @@ $(document).ready(function () {
         let hours = new Date().getHours();
         let minutes = new Date().getMinutes();
         let seconds = new Date().getSeconds();
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+
         let oraAttuale = hours + ":" + minutes + ":" + seconds;
         _rilevamenti.children().eq(3).text(oraAttuale);
         spann = $("<span>").text("ORA ATTUALE").appendTo(_rilevamenti.children().eq(3)).css(stile)
@@ -49,6 +57,14 @@ $(document).ready(function () {
     _btnStato.hide();
 
     //gestione eventi
+    _meteo.on("click", function () {
+        swal({
+            title: "Meteo",
+            text: "Meteo di oggi",
+            icon: "img/nuvola.png",
+            button: "OK",
+        });
+    });
 
 
 
@@ -141,7 +157,7 @@ $(document).ready(function () {
 
     //prendo dati dal db
     //prendo il meteo
-    let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=precipitation&timezone=Europe%2FBerlin")
+    let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&timezone=Europe%2FBerlin")
     rq.then(function (response) {
         datiAttuali(response);
     })
@@ -363,19 +379,47 @@ $(document).ready(function () {
     function datiAttuali(response) {
         let time = [];
         let precipitazioni = [];
+        let nuvole = [];
+        let day = [];
 
         for (let i = 0; i < 23; i++) {
             time.push(response.data.hourly.time[i]);
             precipitazioni.push(response.data.hourly.precipitation[i]);
+            nuvole.push(response.data.hourly.cloud_cover[i]);
+            day.push(response.data.hourly.is_day[i]);
         }
 
         let oraAttuale = new Date().getHours();
 
-        if (precipitazioni[oraAttuale] > 0) {
-            _meteo.text("Pioggia");
+        if (precipitazioni[oraAttuale] > 2) {
+            _meteo.prop("src", "img/pioggiaForte.png");
+        }
+        else if (precipitazioni[oraAttuale] >= 1 && precipitazioni[oraAttuale] <= 2) {
+            _meteo.prop("src", "img/pioggiaForte.png");
         }
         else if (precipitazioni[oraAttuale] == 0) {
-            _meteo.text("Sole");
+            if (day[oraAttuale] == 1) {
+                if (nuvole[oraAttuale] >= 40 && nuvole[oraAttuale] < 70) {
+                    _meteo.prop("src", "img/mezzaNuvola.png");
+                }
+                else if (nuvole[oraAttuale] >= 70) {
+                    _meteo.prop("src", "img/nuvola.png");
+                }
+                else {
+                    _meteo.prop("src", "img/sole.png");
+                }
+            }
+            else {
+                if (nuvole[oraAttuale] >= 40 && nuvole[oraAttuale] < 70) {
+                    _meteo.prop("src", "img/mezzaNotte.png");
+                }
+                else if (nuvole[oraAttuale] >= 70) {
+                    _meteo.prop("src", "img/nuvola.png");
+                }
+                else {
+                    _meteo.prop("src", "img/notte.png");
+                }
+            }
         }
     }
 
@@ -414,5 +458,4 @@ $(document).ready(function () {
             },
         })
     });
-
 });
