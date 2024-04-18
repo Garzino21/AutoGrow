@@ -3,6 +3,8 @@
 
 //icone https://icons8.it/icon/set/meteo/fluency
 
+//https://uiverse.io/
+
 $(document).ready(function () {
     let stile = { "font-size": "15pt", "color": "black", "font-weight": "bold", "width": "100%" }
     //variabili
@@ -23,9 +25,6 @@ $(document).ready(function () {
     let _prog = $(".prog");
     let _home = $(".home");
     let _meteo = $("#meteo");
-    let _intestazione = $("#intestazione");
-    let _title = $("#title");
-    let _aggiungiMeteo = $("#aggiungiMeteo");
     let _tbody = $("#tbody");
     let _thead = $("#thead");
 
@@ -60,11 +59,14 @@ $(document).ready(function () {
 
     //gestione eventi
     _meteo.on("click", function () {
-        Swal.fire({
-            title: "<i>Meteo di oggi</i>",
-            html: `<img src='${_meteo.prop("src")}' style='width: 100px; height: 100px;'>`,
-            confirmButtonText: "OK",
-        });
+        console.log("cliccato"+ _meteo.val());
+        
+        let dataDaCercare = _meteo.val();
+        dataDaCercare = dataDaCercare.split("/");
+        dataDaCercare = dataDaCercare[2] + "-" + dataDaCercare[1] + "-" + dataDaCercare[0];
+
+        richiestaDatigiorno(dataDaCercare);
+
     });
 
 
@@ -437,16 +439,17 @@ $(document).ready(function () {
 
             let td = $("<td>").appendTo(_tbody.children().eq(0)).val(day[i]).on("click", function () {
                 richiestaDatigiorno($(this).val());
+                console.log("giorno del valore "+$(this).val());
 
             });
 
             if (precipitazioni[i] > 15) {
                 $("<img>").prop("src", "img/pioggiaForte.png").appendTo(td);
             }
-            else if (precipitazioni[i] > 2 && precipitazioni[i] <= 15) {
+            else if (precipitazioni[i] > 1 && precipitazioni[i] <= 15) {
                 $("<img>").prop("src", "img/pioggiaLeggera.png").appendTo(td);
             }
-            else if (precipitazioni[i] > 0 && precipitazioni[i] <= 2) {
+            else if (precipitazioni[i] > 0 && precipitazioni[i] <= 1) {
                 $("<img>").prop("src", "img/nuvola.png").appendTo(td);
             }
             else if (precipitazioni[i] == 0) {
@@ -477,38 +480,41 @@ $(document).ready(function () {
                 }
             }
         }
-
-        console.log(giorniOrdinati);
+       
 
         for (let giorn of giorniOrdinati) {
-            switch (giorn) {
-                case "Sun":
-                    giorn = "Domenica";
-                    break;
-                case "Mon":
-                    giorn = "Lunedì";
-                    break;
-                case "Tue":
-                    giorn = "Martedì";
-                    break;
-                case "Wed":
-                    giorn = "Mercoledì";
-                    break;
-                case "Thu":
-                    giorn = "Giovedì";
-                    break;
-                case "Fri":
-                    giorn = "Venerdì";
-                    break;
-                case "Sat":
-                    giorn = "Sabato";
-                    break;
-            }
-
+            giorn=calcolaNomeGiorno(giorn);
             $("<td>").text(giorn).appendTo(_thead.children().eq(0));
         }
 
 
+    }
+
+    function calcolaNomeGiorno(giorn) {
+        switch (giorn) {
+            case "Sun":
+                giorn = "Domenica";
+                break;
+            case "Mon":
+                giorn = "Lunedì";
+                break;
+            case "Tue":
+                giorn = "Martedì";
+                break;
+            case "Wed":
+                giorn = "Mercoledì";
+                break;
+            case "Thu":
+                giorn = "Giovedì";
+                break;
+            case "Fri":
+                giorn = "Venerdì";
+                break;
+            case "Sat":
+                giorn = "Sabato";
+                break;
+        }
+        return giorn;
     }
 
     function meteoSettimana() {
@@ -540,7 +546,7 @@ $(document).ready(function () {
     }
 
     function richiestaDatigiorno(giorno) {
-        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&timezone=Europe%2FBerlin")
+        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=temperature&timezone=Europe%2FBerlin")
         rq.then(function (response) {
             RiempioSwal(response, giorno);
         })
@@ -556,12 +562,20 @@ $(document).ready(function () {
     function RiempioSwal(response, giornoScelto) {
         let giornoOggi = new Date().toLocaleDateString();
 
+
+        let dayName = new Date(giornoScelto).toDateString();
+        dayName = dayName.split(" ");
+        dayName = dayName[0];
+        dayName=calcolaNomeGiorno(dayName);
+
         giornoOggi = giornoOggi.split("/");
         giornoOggi = giornoOggi[0];
 
         giornoScelto = giornoScelto.split("-");
         giornoScelto = giornoScelto[2];
         console.log(giornoScelto, giornoOggi);
+
+        
 
         let delay = giornoScelto - giornoOggi;
         let oreDiff = (delay * 24) - (delay * 1);
@@ -571,25 +585,28 @@ $(document).ready(function () {
         let time = [];
         let precipitazioni = [];
         let nuvole = [];
+        let temperatura = [];
 
         for (let i = oreDiff; i <= oreDiff + 24; i++) {
             time.push(response.data.hourly.time[i]);
             precipitazioni.push(response.data.hourly.precipitation[i]);
             nuvole.push(response.data.hourly.cloud_cover[i]);
+            temperatura.push(response.data.hourly.temperature[i]);
         }
         console.log(time, precipitazioni, nuvole);
 
         let imgs = "";
+        let temp="";
         let index = 0;
         for (let prec of precipitazioni) {
             if (index % 3 == 0 && index != 0) {
-                if (prec > 2) {
+                if (prec >= 2) {
                     imgs += "<td><img src='img/pioggiaForte.png'></td>";
                 }
-                else if (prec >= 1 && prec <= 2) {
+                else if (prec >= 0.5 && prec < 2) {
                     imgs += "<td><img src='img/pioggiaLeggera.png'></td>";
                 }
-                else if (prec >= 0 && prec < 1) {
+                else if (prec >= 0 && prec < 0.5) {
                     console.log("nuv" + nuvole[index], index);
                     if (nuvole[index] >= 40 && nuvole[index] < 70) {
                         imgs += "<td><img src='img/mezzaNuvola.png'></td>";
@@ -601,6 +618,7 @@ $(document).ready(function () {
                         imgs += "<td><img src='img/sole.png'></td>";
                     }
                 }
+                temp+=`<td>${temperatura[index]}°C</td>`;
                 console.log(imgs);
             }
             index++;
@@ -613,14 +631,14 @@ $(document).ready(function () {
         let html = `<table id='tabSwal'>
         <thead>
           <tr>
-            <td>00:00-2:00</td>
-            <td>3:00-5:00</td>
-            <td>6:00-8:00</td>
-            <td>9:00-11:00</td>
-            <td>12:00-14:00</td>
-            <td>15:00-17:00</td>
-            <td>18:00-20:00</td>
-            <td>21:00-23:00</td>
+            <td>00-2</td>
+            <td>3-5</td>
+            <td>6-8</td>
+            <td>9-11</td>
+            <td>12-14</td>
+            <td>15-17</td>
+            <td>18-20</td>
+            <td>21-23</td>
           </tr>
         </thead>
         <tbody>
@@ -628,21 +646,15 @@ $(document).ready(function () {
           ${imgs}
           </tr>
           <tr>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
-            <td>15-<span>45</span></td>
+          ${temp}
           </tr>
         </tbody>
       </table>`;
 
         Swal.fire({
-            title: "<i>Meteo di oggi</i>",
+            title: `<i>Meteo di ${dayName}</i>`,
             html: html,
+            background: "rgb(231, 255, 186)",
             width: "80%",
             heightAuto: "false",
             confirmButtonText: "OK",
