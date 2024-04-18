@@ -27,6 +27,7 @@ $(document).ready(function () {
     let _meteo = $("#meteo");
     let _tbody = $("#tbody");
     let _thead = $("#thead");
+    let _domanda= $(".domanda");
 
     _navBar.hide();
 
@@ -59,17 +60,29 @@ $(document).ready(function () {
 
     //gestione eventi
     _meteo.on("click", function () {
-        console.log("cliccato"+ _meteo.val());
-        
+        console.log("cliccato" + _meteo.val());
+
         let dataDaCercare = _meteo.val();
         dataDaCercare = dataDaCercare.split("/");
         dataDaCercare = dataDaCercare[2] + "-" + dataDaCercare[1] + "-" + dataDaCercare[0];
 
         richiestaDatigiorno(dataDaCercare);
-
     });
 
+    _domanda.children().on("click", function () {
+        let testo = "";
 
+        console.log($(this).val());
+
+        Swal.fire({
+            title: `<i>${testo}</i>`,
+            html: `<div>cacca contro il muro</div>`,
+            background: "rgb(231, 255, 186)",
+            width: "45%",
+            heightAuto: "false",
+            confirmButtonText: "OK",
+        });
+    })
 
     _monitora.on("click", function () {
         _paginaIniziale.hide();
@@ -424,12 +437,14 @@ $(document).ready(function () {
         let precipitazioni = [];
         let tMax = [];
         let tMin = [];
+        let neve = [];
 
         for (let i = 0; i < 7; i++) {
             day.push(response.data.daily.time[i]);
             precipitazioni.push(response.data.daily.precipitation_sum[i]);
             tMax.push(response.data.daily.temperature_2m_max[i]);
             tMin.push(response.data.daily.temperature_2m_min[i]);
+            neve.push(response.data.daily.snowfall_sum[i]);
         }
 
         let oggi = new Date().toLocaleDateString();
@@ -439,15 +454,30 @@ $(document).ready(function () {
 
             let td = $("<td>").appendTo(_tbody.children().eq(0)).val(day[i]).on("click", function () {
                 richiestaDatigiorno($(this).val());
-                console.log("giorno del valore "+$(this).val());
-
+                console.log("giorno del valore " + $(this).val());
             });
 
             if (precipitazioni[i] > 15) {
-                $("<img>").prop("src", "img/pioggiaForte.png").appendTo(td);
+                if (neve[i] > 0 && neve[i] < 5) {
+                    $("<img>").prop("src", "img/neveLeggera.png").appendTo(td);
+                }
+                else if (neve[i] >= 5) {
+                    $("<img>").prop("src", "img/neveForte.png").appendTo(td);
+                }
+                else {
+                    $("<img>").prop("src", "img/pioggiaForte.png").appendTo(td);
+                }
             }
             else if (precipitazioni[i] > 1 && precipitazioni[i] <= 15) {
-                $("<img>").prop("src", "img/pioggiaLeggera.png").appendTo(td);
+                if (neve[i] > 0 && neve[i] < 5) {
+                    $("<img>").prop("src", "img/neveLeggera.png").appendTo(td);
+                }
+                else if (neve[i] >= 5) {
+                    $("<img>").prop("src", "img/neveForte.png").appendTo(td);
+                }
+                else {
+                    $("<img>").prop("src", "img/pioggiaLeggera.png").appendTo(td);
+                }
             }
             else if (precipitazioni[i] > 0 && precipitazioni[i] <= 1) {
                 $("<img>").prop("src", "img/nuvola.png").appendTo(td);
@@ -480,10 +510,10 @@ $(document).ready(function () {
                 }
             }
         }
-       
+
 
         for (let giorn of giorniOrdinati) {
-            giorn=calcolaNomeGiorno(giorn);
+            giorn = calcolaNomeGiorno(giorn);
             $("<td>").text(giorn).appendTo(_thead.children().eq(0));
         }
 
@@ -518,7 +548,7 @@ $(document).ready(function () {
     }
 
     function meteoSettimana() {
-        rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&daily=temperature_2m_max&daily=temperature_2m_min&daily=precipitation_sum&timezone=Europe%2FBerlin")
+        rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&daily=temperature_2m_max&daily=temperature_2m_min&daily=precipitation_sum&daily=snowfall_sum&timezone=Europe%2FBerlin")
         rq.then(function (response) {
             datiSettimana(response);
         })
@@ -532,7 +562,7 @@ $(document).ready(function () {
     }
 
     function meteoOggi() {
-        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&timezone=Europe%2FBerlin")
+        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&hourly=snowfall&timezone=Europe%2FBerlin")
         rq.then(function (response) {
             datiAttuali(response);
         })
@@ -546,7 +576,7 @@ $(document).ready(function () {
     }
 
     function richiestaDatigiorno(giorno) {
-        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=temperature&timezone=Europe%2FBerlin")
+        let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=temperature&hourly=snowfall&timezone=Europe%2FBerlin")
         rq.then(function (response) {
             RiempioSwal(response, giorno);
         })
@@ -566,7 +596,7 @@ $(document).ready(function () {
         let dayName = new Date(giornoScelto).toDateString();
         dayName = dayName.split(" ");
         dayName = dayName[0];
-        dayName=calcolaNomeGiorno(dayName);
+        dayName = calcolaNomeGiorno(dayName);
 
         giornoOggi = giornoOggi.split("/");
         giornoOggi = giornoOggi[0];
@@ -575,7 +605,7 @@ $(document).ready(function () {
         giornoScelto = giornoScelto[2];
         console.log(giornoScelto, giornoOggi);
 
-        
+
 
         let delay = giornoScelto - giornoOggi;
         let oreDiff = (delay * 24) - (delay * 1);
@@ -586,29 +616,55 @@ $(document).ready(function () {
         let precipitazioni = [];
         let nuvole = [];
         let temperatura = [];
+        let neve = [];
 
         for (let i = oreDiff; i <= oreDiff + 24; i++) {
             time.push(response.data.hourly.time[i]);
             precipitazioni.push(response.data.hourly.precipitation[i]);
             nuvole.push(response.data.hourly.cloud_cover[i]);
             temperatura.push(response.data.hourly.temperature[i]);
+            neve.push(response.data.hourly.snowfall[i]);
         }
         console.log(time, precipitazioni, nuvole);
 
         let imgs = "";
-        let temp="";
+        let temp = "";
         let index = 0;
         for (let prec of precipitazioni) {
             if (index % 3 == 0 && index != 0) {
                 if (prec >= 2) {
-                    imgs += "<td><img src='img/pioggiaForte.png'></td>";
+                    if (neve[index] > 0 && neve[index] < 0.5) {
+                        imgs += "<td><img src='img/neveLeggera.png'></td>";
+                    }
+                    else if (neve[index] >= 0.5) {
+                        imgs += "<td><img src='img/neveForte.png'></td>";
+                    }
+                    else {
+                        imgs += "<td><img src='img/pioggiaForte.png'></td>";
+                    }
                 }
                 else if (prec >= 0.5 && prec < 2) {
-                    imgs += "<td><img src='img/pioggiaLeggera.png'></td>";
+                    if (neve[index] > 0 && neve[index] < 0.5) {
+                        imgs += "<td><img src='img/neveLeggera.png'></td>";
+                    }
+                    else if (neve[index] >= 0.5) {
+                        imgs += "<td><img src='img/neveForte.png'></td>";
+                    }
+                    else {
+                        imgs += "<td><img src='img/pioggiaLeggera.png'></td>";
+                    }
                 }
                 else if (prec >= 0 && prec < 0.5) {
                     console.log("nuv" + nuvole[index], index);
-                    if (nuvole[index] >= 40 && nuvole[index] < 70) {
+                    if(neve[index]>0 && neve[index]<0.5)
+                    {
+                        imgs += "<td><img src='img/neveLeggera.png'></td>";
+                    }
+                    else if(neve[index]>=0.5)
+                    {
+                        imgs += "<td><img src='img/neveForte.png'></td>";
+                    }
+                    else if (nuvole[index] >= 40 && nuvole[index] < 70) {
                         imgs += "<td><img src='img/mezzaNuvola.png'></td>";
                     }
                     else if (nuvole[index] >= 70) {
@@ -618,7 +674,7 @@ $(document).ready(function () {
                         imgs += "<td><img src='img/sole.png'></td>";
                     }
                 }
-                temp+=`<td>${temperatura[index]}°C</td>`;
+                temp += `<td>${temperatura[index]}°C</td>`;
                 console.log(imgs);
             }
             index++;

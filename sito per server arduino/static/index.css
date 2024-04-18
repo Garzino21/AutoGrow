@@ -285,11 +285,26 @@ nav{
   margin-top: 10px;
 }
 
-#swal2-html-container
+/* #swal2-html-container
 {
-  /* height: 250px; */
+  height: 250px; 
+} */
+
+#fileDiLog{
+
+  float: left;
+  margin-left: 2%;
 }
 
+.domanda{
+  display: inline-block;
+}
+
+.domanda img{
+  padding-bottom: 7px;
+  width: 23px;
+  height: 30px;
+}
 
 /* CSS LOGIN PAGE */
 .form_main {
