@@ -4,6 +4,7 @@ html {
 }
 
 body {
+  padding-right: 17px;
   padding-top: 120px;
   width: 100dvw;
   min-height: 100dvh;
@@ -26,14 +27,6 @@ body {
   height: 100% !important;
   object-fit: cover;
   z-index: -100;
-}
-
-#container {
-  height: 100%;
-  width: 100%;
-  margin-top: 0;
-  padding: 0;
-  text-align: center;
 }
 
 .container {
@@ -213,6 +206,22 @@ td {
 
 .button:hover {
   cursor: pointer;
+}
+
+#selectVisualData{
+  border: 0;
+  margin-top: 10px;
+  border-radius: 25px;
+  text-align: center;
+  width: 10%;
+  height: 30px;
+  font-size: 13pt;
+  font-weight: bold;
+}
+
+#selectVisualData option{
+  background-color: rgb(109, 137, 102);
+  color: white;
 }
 
 #selectStorico{
@@ -411,20 +420,127 @@ nav{
 }
 
 
-
+#liMeteo span{
+  display: none;
+}
+.nav-link:hover{
+  cursor: pointer;
+}
 
 
 
 
 /* MEDIA QUERIES */
 
-@media screen and (max-width: 991px) {
+@media all and (max-width: 991px) {
   #meteo{
-    float: left;
-    width: 0;
-    height: 0;
+    display: none;
   }
-}
 
-@media screen and (max-width: 800px) {
+  #liMeteo span{
+    display: initial;
+  }
+
+  body{
+    width: 100%;
+    padding-right:0;
+  }
+  .container 
+  {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    max-width: none; 
+    height: 100%;
+    margin-bottom: 0;
+  }
+  
+  #rilevamenti{
+    height: 200px;
+  }
+
+  #rilevamenti div{
+    height: 100%;
+    padding-top: 5%;
+    font-size: 2.5rem;
+  }
+
+  .paramTitolo{
+    font-size: 2.5rem;
+    margin-bottom: 2%;
+  }
+
+  select{
+    font-size: 1.5rem!important;
+    height: 90px!important;
+
+  }
+
+  .indent{
+    font-size: 2rem;
+  }
+
+  .domanda img{
+    width: 35px;
+    height: 45px;
+  }
+
+  #tabSwal{
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  #tabMeteo{
+    font-size: 1rem;
+    height: 100px;
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  #paginaDati{
+    margin-bottom: unset!important;
+  }
+
+  #logo{
+    font-size: 3rem;
+  }
+
+  .navbar{
+    font-size: 1.5rem;
+  }
+
+  .navbar-toggler-icon{
+    font-size: 2.5rem;
+  }
+
+  .application{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  #intestazione{
+    margin-top: 18%;
+  }
+
+  #btnStato{
+    float: right;
+    margin-right: 3%;
+    margin-bottom: unset;
+  }
+
+  .button{
+    text-align: center;
+    width: 40%;
+    height: 100px;
+  }
+  #btnModalita{
+    margin-left: 3%;
+    width: 40%;
+    float: left;
+    margin-bottom: unset;
+  }
+
+  .togliBr{
+    display: none;
+  }
 }

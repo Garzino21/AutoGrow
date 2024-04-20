@@ -43,7 +43,7 @@ void setup() {
 }
 
 void loop() {
-  delay(300000);
+  delay(600000);
   client = collegaServer();
   inviaDati(client);
   delay(1000);

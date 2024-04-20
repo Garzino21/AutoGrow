@@ -41,8 +41,9 @@
         </li>
       </ul>
       <ul class="navbar-nav ml-auto">
-        <li>
-          <img src="img/nuvola.png" alt="METEO" id="meteo" >
+        <li id="liMeteo">
+          <img src="" alt="METEO" id="meteo" >
+          <span class="nav-link">Meteo</span>
         </li>
       </ul>
     </div>
@@ -94,6 +95,12 @@
       modo da poterle avere a disposizione prima del periodo
       primaverile. Inoltre, il sistema è stato progettato per essere il più versatile possibile, in modo da poter essere
       utilizzato per qualsiasi tipo di pianta.
+      <br>
+      <br>
+      <h2 style="color: rgb(144, 210, 126); font-weight: bold;">USI FUTURI...</h2>
+      In un futuro penso di espandere l'utilizzo di <span style="color: rgb(144, 210, 126);font-weight: bold;">Auto Grow</span> alla mia serra personale, in modo da poter 
+      monitorare e controllare la crescita delle piante in modo ancora più efficiente, ma sopratutto anche da lontano.
+      Doterò inoltre il mio orto di un tablet gestionale per poter tenere tutto sotto controllo anche da vicino e in modo piu' pratico.
     </div>
 
     <div id="paginaDati" class="application">
@@ -107,18 +114,25 @@
 
 
       <div id="parametri">
-        <div class="paramTitolo" style="margin-top: 2%; float: left;">GRAFICO ILLUSTRATIVO  <div class="domanda"><img src="img/domanda.png" value="grafico"></div></div>
+        <div class="paramTitolo" style="margin-top: 2%; float: left;">GRAFICO ILLUSTRATIVO  <div class="domanda"><img src="img/domanda.png" name="grafico"></div></div>
+        
         <select name="selectStorico" id="selectStorico"></select>
+        <select name="selectVisualData" id="selectVisualData">
+          <option value="10">10 min</option>
+          <option value="30">30 min</option>
+          <option value="60">1 ora</option>
+        </select>
+
         <div class="div" style="background-color: transparent;">
           <div id="contenitoreCanvas">
             <canvas id="myChart"></canvas>
           </div>
         </div>
-        <div class="paramTitolo">PROGRAMMA IRRIGAZIONE <div class="domanda"><img src="img/domanda.png" value="irrigazione"></div></div>
+        <div class="paramTitolo">PROGRAMMA IRRIGAZIONE <div class="domanda"><img src="img/domanda.png" name="irrigazione"></div></div>
         <div class="div cont" id="impostazioni">
           <!-- <img src="img/file.png" id="fileDiLog"> -->
           <div id="btnModalita" class="button" style="width: fit-content; margin-bottom: 20px;">AUTOMATICO</div>
-          <br>
+          <br class="togliBr">
           <div id="btnStato" class="button irrig" style="width: 50%; margin-bottom: 20px;">ACCENDI</div>
 
           <table id="tabAutomatico">
@@ -154,10 +168,10 @@
                 <td>Cella 6</td>
               </tr>
 
-            </tbody>
+            </tbody>  
           </table>
         </div>
-        <div class="paramTitolo">METEO SETTIMANALE <div class="domanda" ><img src="img/domanda.png" value="meteo"></div></div>
+        <div class="paramTitolo">METEO SETTIMANALE <div class="domanda" ><img src="img/domanda.png" name="meteo"></div></div>
         <div class="div cont" id="meteoSettimana">
           <table id="tabMeteo">
             <thead id="thead">
@@ -173,7 +187,6 @@
 
     </div>
   </div>
-  <div style="height: 2%;"></div>
 </body>
 
 </html>

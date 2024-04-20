@@ -130,8 +130,8 @@ app.get("/api/inviadati", async (req, res, next) => {
     let collection = client.db(DBNAME).collection("dati");
     let rq = collection.find({}).toArray();
     rq.then(async (risposta) => {
-        let aggiungiT: boolean = false;
-        let aggiungiH: boolean = false;
+        //let aggiungiT: boolean = false;
+        //let aggiungiH: boolean = false;
 
         if(risposta[1].valori!="")
         {
@@ -141,42 +141,41 @@ app.get("/api/inviadati", async (req, res, next) => {
                 //await aggiornaStorico(risposta, date, res, req); 
                 //await eliminareDatiVecchi(risposta, date, res, req);
             }
-    
-            for (let dato of risposta) {
-                if (dato.tipo == "temperatura") {
-                    if (dato.valori[dato.valori.length - 1].dato == temp)
-                        aggiungiT = false;
-                    else
-                        aggiungiT = true;
-    
-                }
-                else if (dato.tipo == "umiditaAria") {
-                    if (dato.valori[dato.valori.length - 1].dato == hum)
-                        aggiungiH = false;
-                    else
-                        aggiungiH = true;
-                }
-            }
-    
-    
-            if (aggiungiT || aggiungiH) {
-                await aggiungoTemperatura(temp, ora, res, date);
-                await aggiungoUmidita(hum, ora, res, date);
-                res.send("aggiunto");
-            }
-            else {
-                console.log("dati uguali");
-                res.send("dati uguali");
-            }
-        }
-        else
-        {
+
             await aggiungoTemperatura(temp, ora, res, date);
             await aggiungoUmidita(hum, ora, res, date);
             res.send("aggiunto");
-        }
-       
 
+            //#region Codice controllo se i dati sono uguali
+            //NON FACCIO PIU IL CONTROLLO SE CAMBIANO I DATI PER POTER VISUALIZZARE AL MEGLIO I GRAFICI
+            // for (let dato of risposta) {
+            //     if (dato.tipo == "temperatura") {
+            //         if (dato.valori[dato.valori.length - 1].dato == temp)
+            //             aggiungiT = false;
+            //         else
+            //             aggiungiT = true;
+    
+            //     }
+            //     else if (dato.tipo == "umiditaAria") {
+            //         if (dato.valori[dato.valori.length - 1].dato == hum)
+            //             aggiungiH = false;
+            //         else
+            //             aggiungiH = true;
+            //     }
+            // }
+    
+    
+            // if (aggiungiT || aggiungiH) {
+            //     await aggiungoTemperatura(temp, ora, res, date);
+            //     await aggiungoUmidita(hum, ora, res, date);
+            //     res.send("aggiunto");
+            // }
+            // else {
+            //     console.log("dati uguali");
+            //     res.send("dati uguali");
+            // }
+            //#endregion
+        }
     });
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
@@ -243,7 +242,7 @@ async function aggiungoUmidita(hum: any, ora: any, res: any, date: any) {
     let collection = client.db(DBNAME).collection("dati");
 
     //aggiungo il dato
-    let rq = collection.updateOne({ tipo: 'umiditaAria' }, { $addToSet: { 'valori': { "dato": hum, "ora": ora, "data": date } } });
+    let rq = collection.updateOne({ tipo: 'umiditaAria' }, { $push: { 'valori': { "dato": hum, "ora": ora, "data": date } } });
     rq.then((data) => {
         console.log("aggiunta umidita");
     }
@@ -259,7 +258,7 @@ async function aggiungoTemperatura(temp: any, ora: any, res: any, date: any) {
     let collection = client.db(DBNAME).collection("dati");
 
     //aggiungo il dato
-    let rq = collection.updateOne({ tipo: 'temperatura' }, { $addToSet: { 'valori': { "dato": temp, "ora": ora, "data": date } } });
+    let rq = collection.updateOne({ tipo: 'temperatura' }, { $push: { 'valori': { "dato": temp, "ora": ora, "data": date } } });
     rq.then((data) => {
         console.log("aggiunta temperatura");
     }

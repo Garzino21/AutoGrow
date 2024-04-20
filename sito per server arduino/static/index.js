@@ -1,5 +1,9 @@
-//migliorare il meteo problema icona nell menu hamburger
-//click sul meteo vedere tutta la settimana in swal con le icone
+//gestire tutto il lato dell'irrigazione
+//gestire che se clicco su un orario del meteo della swal mi dia le precipitazioni e il vento
+//gestire il gps quindi mettere la posizione su maps quindi coppo un gps e metto la posizione
+//opzionale gestire una ventola che faccia circolare l'aria
+//opzionale gestire l'acqua rimanente nel serbatoio
+//da arduino metto che appena acceso manda un dato e poi aspetta 10 minuti e manda un altro dato
 
 //icone https://icons8.it/icon/set/meteo/fluency
 
@@ -27,14 +31,14 @@ $(document).ready(function () {
     let _meteo = $("#meteo");
     let _tbody = $("#tbody");
     let _thead = $("#thead");
-    let _domanda= $(".domanda");
+    let _domanda = $(".domanda");
+    let _selectVisualData = $("#selectVisualData");
 
     _navBar.hide();
 
     const ctx = $("#myChart");
 
     //RIQUADRO ORARIO
-
     setInterval(function () {
         let spann = $("<span>").text("").appendTo(_rilevamenti.children().eq(3)).css(stile)
         let hours = new Date().getHours();
@@ -60,41 +64,68 @@ $(document).ready(function () {
 
     //gestione eventi
     _meteo.on("click", function () {
-        console.log("cliccato" + _meteo.val());
-
-        let dataDaCercare = _meteo.val();
-        dataDaCercare = dataDaCercare.split("/");
-        dataDaCercare = dataDaCercare[2] + "-" + dataDaCercare[1] + "-" + dataDaCercare[0];
-
-        richiestaDatigiorno(dataDaCercare);
+        funzMeteo(_meteo.val());
     });
 
+    $("#liMeteo").children().eq(1).on("click", function () {
+        $(this).addClass("active");
+        _monitora.removeClass("active");
+        _prog.removeClass("active");
+        _home.removeClass("active");
+        funzMeteo(_meteo.val());
+    });
+
+    function funzMeteo(valore) {
+        let dataDaCercare = valore;
+        dataDaCercare = dataDaCercare.split("/");
+        dataDaCercare = dataDaCercare[2] + "-" + dataDaCercare[1] + "-" + dataDaCercare[0];
+        richiestaDatigiorno(dataDaCercare);
+    }
+
+
+    //gestione della select visualizzazione dati
+    _selectVisualData.on("change", function () {
+        gestioneSelect();
+    });
+    //gestione dei click sulle domande vicino ai titoli
     _domanda.children().on("click", function () {
         let testo = "";
+        console.log($(this).prop("name"));
 
-        console.log($(this).val());
+        if ($(this).prop("name") == "grafico") {
+            testo = "il grafico della giornata odierna viene aggiornato ogni 5 minuti, puoi vedere la temperatura e l'umidità dell'aria, per vedere le giornate vecchie seleziona la data dal menù a tendina sottostante, per cambiare la visualizzazione dei dati clicca sull'opzione vusualizzazione dati all'ora";
+        }
+        else if ($(this).prop("name") == "irrigazione") {
+            testo = "Clicca su MANUALE per impostare l'irrigazione manuale, clicca su AUTOMATICO per impostare l'irrigazione automatica e inizia a settare i parametri di irrigazione necessari";
+        }
+        else if ($(this).prop("name") == "meteo") {
+            testo = "Ecco il meteo settimanale, Clicca su un'icona per vedere il meteo della giornata selezionata";
+        }
 
         Swal.fire({
-            title: `<i>${testo}</i>`,
-            html: `<div>cacca contro il muro</div>`,
+            icon: "question",
+            html: `<div class='indent'>${testo}</div>`,
             background: "rgb(231, 255, 186)",
-            width: "45%",
+            width: "55%",
             heightAuto: "false",
             confirmButtonText: "OK",
         });
     })
 
+    //btnMonitora
     _monitora.on("click", function () {
         _paginaIniziale.hide();
         _progetto.hide();
         _paginaDati.show();
         _body.css("overflow-y", "scroll");
         _navBar.show();
+        $("#liMeteo").children().eq(1).removeClass("active");
         _monitora.addClass("active");
         _prog.removeClass("active");
         _home.removeClass("active");
     });
 
+    //btnProgetto
     _prog.on("click", function () {
         _progetto.show();
         _paginaIniziale.hide();
@@ -105,8 +136,10 @@ $(document).ready(function () {
         _prog.addClass("active");
         _monitora.removeClass("active");
         _home.removeClass("active");
+        $("#liMeteo").children().eq(1).removeClass("active");
     })
 
+    //ritorno alla home
     _home.on("click", function () {
         _paginaIniziale.show();
         _paginaDati.hide();
@@ -116,8 +149,10 @@ $(document).ready(function () {
         _home.addClass("active");
         _prog.removeClass("active");
         _monitora.removeClass("active");
+        $("#liMeteo").children().eq(1).removeClass("active");
     })
 
+    //modAutomatico e manuale
     _modalitaIrrigazione.on("click", function () {
         if (_modalitaIrrigazione.text() == "MANUALE") {
             _modalitaIrrigazione.text("Caricamento...");
@@ -129,23 +164,46 @@ $(document).ready(function () {
         }
     });
 
+    //btnStato acceso spento irriga in manuale
     _btnStato.on("click", function () {
         if (_btnStato.text() == "ACCENDI") {
             _btnStato.text("SPEGNI").css({ "background-color": "red", "border-color": "red" });
-            Swal.fire("HAI ACCESO L'IRRIGAZIONE", "", "success");
+            Swal.fire({
+                icon: "success",
+                html: `<div class='indent'>HAI ACCESO L'IRRIGAZIONE</div>`,
+                background: "rgb(231, 255, 186)",
+                width: "55%",
+                heightAuto: "false",
+                confirmButtonText: "OK",
+            });
         }
         else {
             _btnStato.text("ACCENDI").css({ "background-color": "green", "border-color": "green" });;
-            Swal.fire("HAI SPENTO L'IRRIGAZIONE", "", "success");
+            Swal.fire({
+                icon: "success",
+                html: `<div class='indent'>HAI SPENTO L'IRRIGAZIONE</div>`,
+                background: "rgb(231, 255, 186)",
+                width: "55%",
+                heightAuto: "false",
+                confirmButtonText: "OK",
+            });
         }
     });
 
+    //prendo dati vecchi
     _selectStorico.on("change", function () {
+        gestioneSelect();
+    })
+
+    function gestioneSelect() {
         myChartix.destroy();
         if (_selectStorico.val() == new Date().toLocaleDateString()) {
             let rq = inviaRichiesta("POST", "/api/prendidati")
             rq.then(function (response) {
-                creaChart(response);
+                if (_selectVisualData.val() != 10)
+                    prendiVisualDataOggi(_selectVisualData.val(), response)             //-----------------------------------------------------------------------------------------
+                else
+                    creaChart(response);
             })
             rq.catch(function (err) {
                 if (err.response.status == 401) {
@@ -159,7 +217,10 @@ $(document).ready(function () {
 
             let rq = inviaRichiesta("POST", "/api/prendiStorico")
             rq.then(function (response) {
-                creaChart(response);
+                if (_selectVisualData.val() != 10)
+                    prendiVisualDataStorico(_selectVisualData.val(), response)
+                else
+                    creaChart(response);
             })
             rq.catch(function (err) {
                 if (err.response.status == 401) {
@@ -169,11 +230,73 @@ $(document).ready(function () {
                     errore(err);
             })
         }
-    })
+    }
+    function prendiVisualDataOggi(visualData, response) {
+
+        let data = [];
+        let valoreTemperatura = [];
+        let umiditaAria = [];
+
+        for (let item of response.data) {
+            if (item.tipo == "temperatura") {
+                //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+                for (let valore of item.valori) {
+                    valoreTemperatura.push(valore.dato);
+                    data.push(valore.ora);
+                }
+            }
+            else if (item.tipo == "umiditaAria") {
+                //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
+                for (let valore of item.valori) {
+                    umiditaAria.push(valore.dato);
+                }
+            }
+        }
+
+        let coeffTaglio = visualData / 10;
+
+        data = data.filter((item, index) => index % coeffTaglio == 0);
+        valoreTemperatura = valoreTemperatura.filter((item, index) => index % coeffTaglio == 0);
+        umiditaAria = umiditaAria.filter((item, index) => index % coeffTaglio == 0);
+
+        visualGrafica(data, valoreTemperatura, umiditaAria);
+    }
+
+    function prendiVisualDataStorico(visualData, response) {
+
+        let data = [];
+        let valoreTemperatura = [];
+        let umiditaAria = [];
+
+        for (let item of response.data) {
+            if (item.tipo == "temperatura") {
+                //prendo i dati della temperatura e della data che userò anche per la data dell'umidità
+                for (let valore of item.valori) {
+                    valoreTemperatura.push(valore.dato);
+                    data.push(valore.ora);
+                }
+            }
+            else if (item.tipo == "umiditaAria") {
+                //prendo i dati dell'umidità senza data tanto è all'incirca uguale alla temperatura
+                for (let valore of item.valori) {
+                    umiditaAria.push(valore.dato);
+                }
+            }
+        }
+
+        let coeffTaglio = visualData / 10;
+
+        data = data.filter((item, index) => index % coeffTaglio == 0);
+        valoreTemperatura = valoreTemperatura.filter((item, index) => index % coeffTaglio == 0);
+        umiditaAria = umiditaAria.filter((item, index) => index % coeffTaglio == 0);
+
+        visualGrafica(data, valoreTemperatura, umiditaAria);
+    }
+
+
 
     //prendo dati dal db
     //prendo il meteo
-
     meteoOggi();
     meteoSettimana();
 
@@ -231,6 +354,7 @@ $(document).ready(function () {
             errore(err);
     })
 
+
     //prendo azioni
     rq = inviaRichiesta("POST", "/api/prendiazioni")
     rq.then(function (response) {
@@ -246,6 +370,7 @@ $(document).ready(function () {
             errore(err);
     })
 
+    //cambio stato irrigazione in caso di successo
     function riempioAzioni(response) {
         for (let action of response.data) {
             if (action.tipo == "irrigazione") {
@@ -270,6 +395,7 @@ $(document).ready(function () {
         }
     }
 
+    //aggiorno db da manuale a automatico e viceversa
     function aggiornoDb(modalita) {
         let rq = inviaRichiesta("POST", "/api/aggiornamodalita", { "modalita": modalita });
         rq.then(function (response) {
@@ -296,29 +422,39 @@ $(document).ready(function () {
 
 
 
+    //riempio quadratini dei dati attuali
     function riempiCampi(response) {
         for (let item of response.data) {
-            if (item.tipo == "temperatura") {
-                let valoreTemperatura = item.valori[item.valori.length - 1].dato;
-                console.log(valoreTemperatura);
-                _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
-                $("<span>").text("TEMPERATURA").appendTo(_rilevamenti.children().eq(0)).css(stile)
+            if (item.valori.length > 0) {
+                if (item.tipo == "temperatura") {
+                    let valoreTemperatura = item.valori[item.valori.length - 1].dato;
+                    console.log(valoreTemperatura);
+                    _rilevamenti.children().eq(0).text(valoreTemperatura + "°C");
+                    $("<span>").text("TEMPERATURA").appendTo(_rilevamenti.children().eq(0)).css(stile)
+                }
+                else if (item.tipo == "umiditaAria") {
+                    let umiditaAria = item.valori[item.valori.length - 1].dato;
+                    console.log(umiditaAria);
+                    _rilevamenti.children().eq(1).text(umiditaAria + "%");
+                    $("<span>").text("HUM ARIA").appendTo(_rilevamenti.children().eq(1)).css(stile)
+                }
+                /*else if (item.tipo == "umiditaTerra") {
+                    let umiditaTerra = item.valori[item.valori.length - 1].dato;
+                    console.log(umiditaTerra);
+                    _rilevamenti.children().eq(2).text(umiditaTerra + "%");
+                    $("<span>").text("HUM TERRA").appendTo(_rilevamenti.children().eq(2)).css(stile)
+                }*/
             }
-            else if (item.tipo == "umiditaAria") {
-                let umiditaAria = item.valori[item.valori.length - 1].dato;
-                console.log(umiditaAria);
-                _rilevamenti.children().eq(1).text(umiditaAria + "%");
-                $("<span>").text("HUM ARIA").appendTo(_rilevamenti.children().eq(1)).css(stile)
+            else {
+                for (let i = 0; i < 3; i++) {
+                    _rilevamenti.children().eq(i).text("NaN");
+                }
             }
-            /*else if (item.tipo == "umiditaTerra") {
-                let umiditaTerra = item.valori[item.valori.length - 1].dato;
-                console.log(umiditaTerra);
-                _rilevamenti.children().eq(2).text(umiditaTerra + "%");
-                $("<span>").text("HUM TERRA").appendTo(_rilevamenti.children().eq(2)).css(stile)
-            }*/
+
         }
     }
 
+    //creo il chart data la response
     function creaChart(response) {
         let data = [];
         let valoreTemperatura = [];
@@ -340,6 +476,12 @@ $(document).ready(function () {
             }
         }
 
+        visualGrafica(data, valoreTemperatura, umiditaAria);
+
+    }
+
+
+    function visualGrafica(data, valoreTemperatura, umiditaAria) {
         console.log(valoreTemperatura, data);
 
         //se i dati sono più di 12 li taglio
@@ -383,7 +525,7 @@ $(document).ready(function () {
 
         //['5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60']
     }
-
+    //prendo dati per il meteo che ce nella nav in alto a destra
     function datiAttuali(response) {
         let time = [];
         let precipitazioni = [];
@@ -432,6 +574,7 @@ $(document).ready(function () {
         }
     }
 
+    //prendo dati settimanali per meteo settimanale
     function datiSettimana(response) {
         let day = [];
         let precipitazioni = [];
@@ -520,6 +663,8 @@ $(document).ready(function () {
 
     }
 
+
+    //calcolo nome del giorno
     function calcolaNomeGiorno(giorn) {
         switch (giorn) {
             case "Sun":
@@ -547,6 +692,7 @@ $(document).ready(function () {
         return giorn;
     }
 
+    //invio richiesta meteo settimana
     function meteoSettimana() {
         rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&daily=temperature_2m_max&daily=temperature_2m_min&daily=precipitation_sum&daily=snowfall_sum&timezone=Europe%2FBerlin")
         rq.then(function (response) {
@@ -561,6 +707,7 @@ $(document).ready(function () {
         })
     }
 
+    //invio richiesta meteo oggi
     function meteoOggi() {
         let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=is_day&hourly=snowfall&timezone=Europe%2FBerlin")
         rq.then(function (response) {
@@ -575,6 +722,7 @@ $(document).ready(function () {
         })
     }
 
+    // invio richiesta meteo giorno scelto
     function richiestaDatigiorno(giorno) {
         let rq = inviaRichiesta("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.6833200&longitude=7.2757100&hourly=cloud_cover&hourly=precipitation&hourly=temperature&hourly=snowfall&timezone=Europe%2FBerlin")
         rq.then(function (response) {
@@ -589,6 +737,7 @@ $(document).ready(function () {
         })
     }
 
+    //riempio la swal con i dati del meteo
     function RiempioSwal(response, giornoScelto) {
         let giornoOggi = new Date().toLocaleDateString();
 
@@ -656,12 +805,10 @@ $(document).ready(function () {
                 }
                 else if (prec >= 0 && prec < 0.5) {
                     console.log("nuv" + nuvole[index], index);
-                    if(neve[index]>0 && neve[index]<0.5)
-                    {
+                    if (neve[index] > 0 && neve[index] < 0.5) {
                         imgs += "<td><img src='img/neveLeggera.png'></td>";
                     }
-                    else if(neve[index]>=0.5)
-                    {
+                    else if (neve[index] >= 0.5) {
                         imgs += "<td><img src='img/neveForte.png'></td>";
                     }
                     else if (nuvole[index] >= 40 && nuvole[index] < 70) {
@@ -684,7 +831,7 @@ $(document).ready(function () {
 
         //imgs.push("<td><img src='img/pioggiaForte.png'></td>");
 
-        let html = `<table id='tabSwal'>
+        let html = `<div class='indent'><table id='tabSwal'>
         <thead>
           <tr>
             <td>00-2</td>
@@ -705,7 +852,7 @@ $(document).ready(function () {
           ${temp}
           </tr>
         </tbody>
-      </table>`;
+      </table></div>`;
 
         Swal.fire({
             title: `<i>Meteo di ${dayName}</i>`,
@@ -716,8 +863,6 @@ $(document).ready(function () {
             confirmButtonText: "OK",
         });
     }
-
-
 
     /*function controlloData(response) {
         let dati = [];
@@ -740,16 +885,4 @@ $(document).ready(function () {
             }
         }
     }*/
-
-    let _impostaIrrigazione = $("#irriga");
-    _impostaIrrigazione.on("click", function () {
-        swal({
-            text: 'Search for a movie. e.g. "La La Land".',
-            content: "input",
-            button: {
-                text: "Search!",
-                closeModal: false,
-            },
-        })
-    });
 });
