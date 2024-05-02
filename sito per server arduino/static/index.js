@@ -4,6 +4,7 @@
 //opzionale gestire una ventola che faccia circolare l'aria
 //opzionale gestire l'acqua rimanente nel serbatoio
 //da arduino metto che appena acceso manda un dato e poi aspetta 10 minuti e manda un altro dato
+//usare millis invece che delay
 
 //icone https://icons8.it/icon/set/meteo/fluency
 
@@ -156,7 +157,12 @@ $(document).ready(function () {
     _modalitaIrrigazione.on("click", function () {
         if (_modalitaIrrigazione.text() == "MANUALE") {
             _modalitaIrrigazione.text("Caricamento...");
+            if (window.innerWidth < 991) {
+                _modalitaIrrigazione.css({ "margin-bottom": "20px", "float": "unset" })
+            }
             aggiornoDb("AUTOMATICO");
+
+
         }
         else {
             _modalitaIrrigazione.text("Caricamento...");
@@ -253,12 +259,12 @@ $(document).ready(function () {
             }
         }
 
-        let coeffTaglio = visualData / 10;
+        let coeffTaglio = (visualData / 10);
 
         data = data.filter((item, index) => index % coeffTaglio == 0);
         valoreTemperatura = valoreTemperatura.filter((item, index) => index % coeffTaglio == 0);
         umiditaAria = umiditaAria.filter((item, index) => index % coeffTaglio == 0);
-
+        console.log("gaga" + data, valoreTemperatura, umiditaAria);
         visualGrafica(data, valoreTemperatura, umiditaAria);
     }
 
@@ -425,7 +431,7 @@ $(document).ready(function () {
     //riempio quadratini dei dati attuali
     function riempiCampi(response) {
         for (let item of response.data) {
-            if (item.valori.length > 0) {
+            if (item.valori != null) {
                 if (item.tipo == "temperatura") {
                     let valoreTemperatura = item.valori[item.valori.length - 1].dato;
                     console.log(valoreTemperatura);
@@ -543,12 +549,29 @@ $(document).ready(function () {
         _meteo.val(new Date().toLocaleDateString());
 
         if (precipitazioni[oraAttuale] > 2) {
-            _meteo.prop("src", "img/pioggiaForte.png");
+            if (neve[i] > 0 && neve[i] < 0.5) {
+                _meteo.prop("src", "img/neveLeggera.png")
+            }
+            else if (neve[i] >= 0.5) {
+                _meteo.prop("src", "img/neveForte.png")
+            }
+            else {
+                _meteo.prop("src", "img/pioggiaForte.png");
+            }
+
         }
         else if (precipitazioni[oraAttuale] >= 1 && precipitazioni[oraAttuale] <= 2) {
-            _meteo.prop("src", "img/pioggiaForte.png");
+            if (neve[i] > 0 && neve[i] < 0.5) {
+                _meteo.prop("src", "img/neveLeggera.png")
+            }
+            else if (neve[i] >= 0.5) {
+                _meteo.prop("src", "img/neveForte.png")
+            }
+            else {
+                _meteo.prop("src", "img/pioggiaLeggera.png");
+            }
         }
-        else if (precipitazioni[oraAttuale] == 0) {
+        else if (precipitazioni[oraAttuale] >= 0 && precipitazioni[oraAttuale] < 1) {
             if (day[oraAttuale] == 1) {
                 if (nuvole[oraAttuale] >= 40 && nuvole[oraAttuale] < 70) {
                     _meteo.prop("src", "img/mezzaNuvola.png");
@@ -752,12 +775,21 @@ $(document).ready(function () {
 
         giornoScelto = giornoScelto.split("-");
         giornoScelto = giornoScelto[2];
-        console.log(giornoScelto, giornoOggi);
+        console.log("giorni " + giornoScelto, giornoOggi);            //problema se giorno scelto è minore di giorno oggi
 
+        let num= capisciMese()
+        console.log("num"+ num);
+        let oreDiff
+        let delay
+        if (giornoScelto < giornoOggi) {
+            delay = num - (giornoOggi - giornoScelto);
+            oreDiff = (delay * 24) - (delay * 1);
+        }
+        else {
+            delay = giornoScelto - giornoOggi;
+            oreDiff = (delay * 24) - (delay * 1);
+        }
 
-
-        let delay = giornoScelto - giornoOggi;
-        let oreDiff = (delay * 24) - (delay * 1);
 
         console.log(oreDiff);
 
@@ -863,6 +895,72 @@ $(document).ready(function () {
             confirmButtonText: "OK",
         });
     }
+
+    //calcola mese
+    function capisciMese() {
+        let mese = new Date().toLocaleDateString();
+        mese = mese.split("/");
+        mese = mese[1];
+        console.log("mese " + mese);
+
+        let n
+        switch (mese) {
+            case "1":
+                n = 30;
+                break;
+            case "2":
+                n = 28;
+                break;
+            case "3":
+                n = 31;
+                break;
+            case "4":
+                n = 30;
+                break;
+            case "5":
+                n = 31;
+                break;
+            case "6":
+                n = 30;
+                break;
+            case "7":
+                n = 31;
+                break;
+            case "8":
+                n = 31;
+                break;
+            case "9":
+                n = 30;
+                break;
+            case "10":
+                n = 31;
+                break;
+            case "11":
+                n = 30;
+                break;
+            case "12":
+                n = 31;
+                break;
+        }
+        return n;
+    }
+
+    //MEDIA QUERY
+    if (_modalitaIrrigazione.text() == "AUTOMATICO") {
+        if (window.innerWidth < 991) {
+            _modalitaIrrigazione.css({ "margin-bottom": "20px", "float": "unset" })
+        }
+    }
+
+    onresize = function () {
+        if (_modalitaIrrigazione.text() == "AUTOMATICO") {
+            if (window.innerWidth < 991) {
+                _modalitaIrrigazione.css({ "margin-bottom": "20px", "float": "unset" })
+            }
+        }
+    }
+
+
 
     /*function controlloData(response) {
         let dati = [];

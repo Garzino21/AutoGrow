@@ -428,6 +428,11 @@ nav{
 }
 
 
+#btnModalita{
+  width: fit-content; 
+  margin-bottom: 20px;
+}
+
 
 
 /* MEDIA QUERIES */
@@ -506,7 +511,8 @@ nav{
   }
 
   .navbar{
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
   }
 
   .navbar-toggler-icon{
@@ -525,22 +531,33 @@ nav{
   #btnStato{
     float: right;
     margin-right: 3%;
-    margin-bottom: unset;
+    margin-bottom: unset!important;
+    width: 45%; 
+    margin-bottom: 20px;
   }
 
   .button{
     text-align: center;
-    width: 40%;
+    width: 45%;
     height: 100px;
+    padding-top: 18px;
   }
   #btnModalita{
     margin-left: 3%;
-    width: 40%;
+    width: 45%;
     float: left;
     margin-bottom: unset;
   }
 
   .togliBr{
     display: none;
+  }
+
+  #progetto{
+    font-size: 3rem;
+  }
+
+  #progetto h2{
+    font-size: 3.5rem;
   }
 }

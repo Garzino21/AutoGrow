@@ -176,6 +176,12 @@ app.get("/api/inviadati", async (req, res, next) => {
             // }
             //#endregion
         }
+        else
+        {
+            await aggiungoTemperatura(temp, ora, res, date);
+            await aggiungoUmidita(hum, ora, res, date);
+            res.send("aggiunto");
+        }
     });
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
