@@ -1,13 +1,10 @@
 //gestire tutto il lato dell'irrigazione
-//gestire che se clicco su un orario del meteo della swal mi dia le precipitazioni e il vento
-//gestire il gps quindi mettere la posizione su maps quindi coppo un gps e metto la posizione
-//opzionale gestire una ventola che faccia circolare l'aria
-//opzionale gestire l'acqua rimanente nel serbatoio
-//da arduino metto che appena acceso manda un dato e poi aspetta 10 minuti e manda un altro dato
-//usare millis invece che delay
+//mettere a posto bug del meteo che a volte mette undefined
+
+//se ho tempo gestire che se hai accesso da visitatore non puoi fare certe cose
+//risolvere il token undefined basta fare le prime richieste tutte annidate
 
 //icone https://icons8.it/icon/set/meteo/fluency
-
 //https://uiverse.io/
 
 $(document).ready(function () {
@@ -34,10 +31,30 @@ $(document).ready(function () {
     let _thead = $("#thead");
     let _domanda = $(".domanda");
     let _selectVisualData = $("#selectVisualData");
-
-    _navBar.hide();
+    let _tbodyAutomatico = $("#tbodyAutomatico");
+    let _chatBtn = $("#chatBtn");
 
     const ctx = $("#myChart");
+
+    //QUI FACCIO UNA RICHIESTA PER I DATI TOTALI INIZIALI 
+    // datiIniziali();      
+
+    async function provoGPT(domanda, listaMex) {
+        console.log(domanda);
+        let rq = inviaRichiesta("POST", "/api/domanda", { "domanda": domanda })
+        rq.then(function (response) {
+            console.log(response);
+            let ul = $("<ul>").appendTo(listaMex).css({ "overflow": "hidden", "style-type": "none" });
+            $("<li>").text(response.data.choices[0].message.content).addClass("risposta").css("style-type", "none").appendTo(ul);
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    }
 
     //RIQUADRO ORARIO
     setInterval(function () {
@@ -58,12 +75,46 @@ $(document).ready(function () {
     }, 1000);
 
     //impostazioni di avvio
-    _paginaIniziale.show().css("margin-top", "flex");
-    _paginaDati.hide();
+    _paginaDati.show();
     _progetto.hide();
     _btnStato.hide();
 
+    //presa dei dati
+    prendiIrrigazioneAutomatica();              //richiestaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
     //gestione eventi
+    _chatBtn.on("click", function () {
+        let html = `  <div class="card">
+        <div class="chat-header">Chat</div>
+          <div class="chat-window">
+            <ul class="message-list"></ul>
+          </div>
+          <div class="chat-input">
+              <input type="text" class="message-input" placeholder="Type your message here">
+              <button id="btnDomanda" class="send-button">Send</button>
+          </div>
+        </div>`;
+
+        Swal.fire({
+            html: html,
+            customClass: "swalGPT",
+            background: "rgb(231, 255, 186)",
+            width: "50%",
+            heightAuto: "false",
+            confirmButtonText: "OK",
+        });
+    });
+
+    $(document).on('click', "#btnDomanda", function () {
+        let domanda = $(".message-input");
+        let listaMex = $(".message-list");
+        let domandona = domanda.val();
+        let ul = $("<ul>").appendTo(listaMex).css({ "overflow": "hidden", "style-type": "none" });
+        $("<li>").text(domanda.val()).addClass("user").css("style-type", "none").appendTo(ul);
+        domanda.val("");
+        provoGPT(domandona, listaMex);
+    });
+
     _meteo.on("click", function () {
         funzMeteo(_meteo.val());
     });
@@ -115,7 +166,6 @@ $(document).ready(function () {
 
     //btnMonitora
     _monitora.on("click", function () {
-        _paginaIniziale.hide();
         _progetto.hide();
         _paginaDati.show();
         _body.css("overflow-y", "scroll");
@@ -129,29 +179,14 @@ $(document).ready(function () {
     //btnProgetto
     _prog.on("click", function () {
         _progetto.show();
-        _paginaIniziale.hide();
         _paginaDati.hide();
         _indietro.show();
         _body.css("overflow", "scroll");
-        _navBar.show();
         _prog.addClass("active");
         _monitora.removeClass("active");
         _home.removeClass("active");
         $("#liMeteo").children().eq(1).removeClass("active");
-    })
-
-    //ritorno alla home
-    _home.on("click", function () {
-        _paginaIniziale.show();
-        _paginaDati.hide();
-        _progetto.hide();
-        _body.css("overflow", "hidden");
-        _navBar.hide();
-        _home.addClass("active");
-        _prog.removeClass("active");
-        _monitora.removeClass("active");
-        $("#liMeteo").children().eq(1).removeClass("active");
-    })
+    });
 
     //modAutomatico e manuale
     _modalitaIrrigazione.on("click", function () {
@@ -161,8 +196,6 @@ $(document).ready(function () {
                 _modalitaIrrigazione.css({ "margin-bottom": "20px", "float": "unset" })
             }
             aggiornoDb("AUTOMATICO");
-
-
         }
         else {
             _modalitaIrrigazione.text("Caricamento...");
@@ -171,8 +204,9 @@ $(document).ready(function () {
     });
 
     //btnStato acceso spento irriga in manuale
-    _btnStato.on("click", function () {
+    _btnStato.on("click", async function () {
         if (_btnStato.text() == "ACCENDI") {
+            await attivaDisattivaIrrigazione(true);
             _btnStato.text("SPEGNI").css({ "background-color": "red", "border-color": "red" });
             Swal.fire({
                 icon: "success",
@@ -185,6 +219,7 @@ $(document).ready(function () {
         }
         else {
             _btnStato.text("ACCENDI").css({ "background-color": "green", "border-color": "green" });;
+            await attivaDisattivaIrrigazione(false);
             Swal.fire({
                 icon: "success",
                 html: `<div class='indent'>HAI SPENTO L'IRRIGAZIONE</div>`,
@@ -195,6 +230,20 @@ $(document).ready(function () {
             });
         }
     });
+
+    function attivaDisattivaIrrigazione(stato){
+        let rq = inviaRichiesta("POST", "/api/attivaDisattivaIrrigazione",{"stato":stato})
+            rq.then(function (response) {
+                console.log(response)
+            })
+            rq.catch(function (err) {
+                if (err.response.status == 401) {
+                    _lblErrore.show();
+                }
+                else
+                    errore(err);
+            })
+    }
 
     //prendo dati vecchi
     _selectStorico.on("change", function () {
@@ -237,6 +286,74 @@ $(document).ready(function () {
             })
         }
     }
+
+
+    async function prendiIrrigazioneAutomatica() {
+        let rq = inviaRichiesta("POST", "/api/prendiIrrigazioneAutomatica")
+        rq.then(async function (response) {
+            console.log(response.data);
+            await generaTabellaAutomatica(response.data);
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    }
+
+    let buttons = [];
+
+    function generaTabellaAutomatica(response) {
+        let i = 0;
+        _tbodyAutomatico.empty();
+        for (let item of response.disponibili) {
+            let tr = $("<tr>").appendTo(_tbodyAutomatico);
+            $("<td>").text(item.hum).appendTo(tr);
+            $("<td>").text(item.timer).appendTo(tr);
+
+            let td = $("<td>").appendTo(tr);
+            let btn = $("<button>").appendTo(td).prop("value", i).on("click", function () {
+                if (btn.text() == "ATTIVO") {
+                    btn.text("Caricando...");
+                    btn.prop("disabled", true);
+                    aggiornaAutomatico(false, item.hum, item.timer, $(this).prop("value"));
+                }
+                else {
+                    btn.text("Caricando...");
+                    btn.prop("disabled", true);
+                    aggiornaAutomatico(true, item.hum, item.timer, $(this).prop("value"));
+                }
+            }).addClass("button tdAuto").css({ "width": "fit-content", "margin": "auto", "height": "fit-content", "font-size": "14pt", "margin-top": "10px", "margin-bottom": "10px" });
+
+            if (item.selected == false) {
+                btn.prop("disabled", false);
+                btn.text("DISATTIVO");
+            }
+            else {
+                btn.prop("disabled", false);
+                btn.text("ATTIVO");
+            }
+            i++;
+        }
+    }
+
+    async function aggiornaAutomatico(selected, hum, timer, posizione) {
+        let rq = inviaRichiesta("POST", "/api/aggiornaIrrigazioneAutomatica", { "hum": hum, "timer": timer, "selected": selected, "posizione": posizione })
+        rq.then(async function (response) {
+            console.log(response.data);
+            await prendiIrrigazioneAutomatica();
+        })
+        rq.catch(function (err) {
+            if (err.response.status == 401) {
+                _lblErrore.show();
+            }
+            else
+                errore(err);
+        })
+    }
+
     function prendiVisualDataOggi(visualData, response) {
 
         let data = [];
@@ -303,11 +420,11 @@ $(document).ready(function () {
 
     //prendo dati dal db
     //prendo il meteo
-    meteoOggi();
-    meteoSettimana();
+    meteoOggi();                          //richiestaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    meteoSettimana();                    //richiestaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 
-    //prendo le date dello storico per vedere se posso usare la select o no
+    //prendo le date dello storico per vedere se posso usare la select o no     //richiestaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     let dateStorico = [];
     rq = inviaRichiesta("POST", "/api/prendiStorico")
     rq.then(function (response) {
@@ -537,12 +654,14 @@ $(document).ready(function () {
         let precipitazioni = [];
         let nuvole = [];
         let day = [];
+        let neve= [];
 
         for (let i = 0; i < 23; i++) {
             time.push(response.data.hourly.time[i]);
             precipitazioni.push(response.data.hourly.precipitation[i]);
             nuvole.push(response.data.hourly.cloud_cover[i]);
             day.push(response.data.hourly.is_day[i]);
+            neve.push(response.data.hourly.snowfall[i]);
         }
 
         let oraAttuale = new Date().getHours();
@@ -561,10 +680,10 @@ $(document).ready(function () {
 
         }
         else if (precipitazioni[oraAttuale] >= 1 && precipitazioni[oraAttuale] <= 2) {
-            if (neve[i] > 0 && neve[i] < 0.5) {
+            if (neve[oraAttuale] > 0 && neve[oraAttuale] < 0.5) {
                 _meteo.prop("src", "img/neveLeggera.png")
             }
-            else if (neve[i] >= 0.5) {
+            else if (neve[oraAttuale] >= 0.5) {
                 _meteo.prop("src", "img/neveForte.png")
             }
             else {
@@ -677,13 +796,10 @@ $(document).ready(function () {
             }
         }
 
-
         for (let giorn of giorniOrdinati) {
             giorn = calcolaNomeGiorno(giorn);
             $("<td>").text(giorn).appendTo(_thead.children().eq(0));
         }
-
-
     }
 
 
@@ -777,11 +893,11 @@ $(document).ready(function () {
         giornoScelto = giornoScelto[2];
         console.log("giorni " + giornoScelto, giornoOggi);            //problema se giorno scelto è minore di giorno oggi
 
-        let num= capisciMese()
-        console.log("num"+ num);
+        let num = capisciMese()
+        console.log("num" + num);
         let oreDiff
         let delay
-        if (giornoScelto < giornoOggi) {
+        if (giornoScelto < giornoOggi) {         //il problema penso sia il fatto che se sono a aprile devo prendere il
             delay = num - (giornoOggi - giornoScelto);
             oreDiff = (delay * 24) - (delay * 1);
         }
@@ -789,7 +905,10 @@ $(document).ready(function () {
             delay = giornoScelto - giornoOggi;
             oreDiff = (delay * 24) - (delay * 1);
         }
-
+        // let a= moment(giornoScelto).format("DD")
+        // let b= moment(giornoOggi).format("DD")
+        // a.diff(b, 'days')
+        // console.log(a.diff(b, 'days'))
 
         console.log(oreDiff);
 
@@ -906,7 +1025,7 @@ $(document).ready(function () {
         let n
         switch (mese) {
             case "1":
-                n = 30;
+                n = 31;
                 break;
             case "2":
                 n = 28;

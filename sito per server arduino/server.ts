@@ -1,20 +1,33 @@
 import _http from "http";
-import _url from "url";
+import _url, { pathToFileURL } from "url";
 import _fs from "fs";
 import _express from "express";
 import _dotenv from "dotenv";
 import _cors from "cors";
 import _fileUpload from "express-fileupload";
 import _streamifier from "streamifier";
+import _bcrypt from "bcryptjs";
+import _jwt from "jsonwebtoken";
+import { Server, Socket } from "socket.io";
+import OpenAI from "openai";
 
 // Lettura delle password e parametri fondamentali
 _dotenv.config({ "path": ".env" });
 
+// Variabili relative a OpenAI
+const OPENAI_API_KEY = process.env.api_key_chatgpt;
+
+//irrigazione
+let statoIrrigazione=false;
 
 // Variabili relative a MongoDB ed Express
 import { MongoClient, ObjectId } from "mongodb";
 const DBNAME = process.env.DBNAME;
 const connectionString: string = process.env.connectionStringAtlas;
+const PRIVATE_KEY = _fs.readFileSync("./keys/privateKey.pem", "utf8");
+const CERTIFICATE = _fs.readFileSync("./keys/certificate.crt", "utf8");
+const ENCRYPTION_KEY = _fs.readFileSync("./keys/encryptionKey.txt", "utf8");
+const CREDENTIALS = { "key": PRIVATE_KEY, "cert": CERTIFICATE };
 const app = _express();
 
 // Creazione ed avvio del server
@@ -83,28 +96,64 @@ const corsOptions = {
 };
 app.use("/", _cors(corsOptions));
 
-//********************************************************************************************//
-// Routes finali di risposta al client
-//********************************************************************************************//
+app.post("/api/login", async (req, res, next) => {
+    let username = req["body"].username;
+    let pwd = req["body"].password;
+    console.log(username, pwd)
 
-app.post("/api/dati", async (req, res, next) => {
     const client = new MongoClient(connectionString);
     await client.connect();
-    let collection = client.db(DBNAME).collection("dati");
-    let rq = collection.find({}).toArray();
-    rq.then((data) => {
-        if (!data) {
-            res.status(401).send("Not found");
+    const collection = client.db(DBNAME).collection("utenti");
+    let regex = new RegExp(`^${username}$`, "i");
+    let rq = collection.findOne({ "username": regex }, { "projection": { "username": 1, "password": 1 } });
+    rq.then((dbUser) => {
+        if (!dbUser) {
+            res.status(401).send("Username non valido");
         }
         else {
-            res.send(data);
+            _bcrypt.compare(pwd, dbUser.password, (err, success) => {
+                if (err) {
+                    res.status(500).send(`Bcrypt compare error: ${err.message}`);
+                }
+                else {
+                    if (!success) {
+                        res.status(401).send("Password non valida");
+                    }
+                    else {
+                        let token = createToken(dbUser);
+                        console.log(token);
+                        res.setHeader("authorization", token);
+                        // Fa si che la header authorization venga restituita al client
+                        res.setHeader("access-control-expose-headers", "authorization");
+                        res.send({ "ris": "ok" });
+                    }
+                }
+            })
         }
     });
-    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
     rq.finally(() => client.close());
 });
+app.get("/api/irrigazioneRichiesta", async (req, res, next) => {
+    if (statoIrrigazione==true)
+        res.send("t");
+    else
+        res.send("f");
+    // const client = new MongoClient(connectionString);
+    // await client.connect();
+    // let collection = client.db(DBNAME).collection("azioni");
+    // let rq = collection.findOne({ tipo: "irrigazione" })
+    // rq.then(async (risposta) => {
+    //     console.log(risposta);
+    //     if (risposta.acceso == false)
+    //         res.send("spegni");
+    //     else
+    //         res.send("accendi");
+    // });
+    // rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    // rq.finally(() => client.close());
+});
 
-//serve a aggiungere dati alla temperatura
 app.get("/api/inviadati", async (req, res, next) => {
     //prendo data e ora all'invio del dato pk altrimenti dovrei avere un altro modulo su arduino
     let now = new Date();
@@ -133,8 +182,7 @@ app.get("/api/inviadati", async (req, res, next) => {
         //let aggiungiT: boolean = false;
         //let aggiungiH: boolean = false;
 
-        if(risposta[1].valori!="")
-        {
+        if (risposta[1].valori != "") {
             console.log("-------------------------------------------------------------------------------------");
             if (risposta[1].valori[(risposta[1].valori.length) - 1].data != date) {    //date data di oggi
                 console.log("aggiorno storico");
@@ -154,7 +202,7 @@ app.get("/api/inviadati", async (req, res, next) => {
             //             aggiungiT = false;
             //         else
             //             aggiungiT = true;
-    
+
             //     }
             //     else if (dato.tipo == "umiditaAria") {
             //         if (dato.valori[dato.valori.length - 1].dato == hum)
@@ -163,8 +211,8 @@ app.get("/api/inviadati", async (req, res, next) => {
             //             aggiungiH = true;
             //     }
             // }
-    
-    
+
+
             // if (aggiungiT || aggiungiH) {
             //     await aggiungoTemperatura(temp, ora, res, date);
             //     await aggiungoUmidita(hum, ora, res, date);
@@ -176,8 +224,7 @@ app.get("/api/inviadati", async (req, res, next) => {
             // }
             //#endregion
         }
-        else
-        {
+        else {
             await aggiungoTemperatura(temp, ora, res, date);
             await aggiungoUmidita(hum, ora, res, date);
             res.send("aggiunto");
@@ -186,6 +233,159 @@ app.get("/api/inviadati", async (req, res, next) => {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 
+});
+
+// 11. Controllo del token
+app.use("/api/", (req: any, res: any, next: any) => {
+    console.log("Controllo tokenccccccccccc");
+    console.log(req.headers["authorization"]);
+    if (!req.headers["authorization"]) {
+        console.log("Token mancante");
+        res.status(403).send("Token mancante");
+    }
+    else {
+        let token = req.headers["authorization"];
+        _jwt.verify(token, ENCRYPTION_KEY, (err, payload) => {
+            if (err) {
+                res.status(403).send(`Token non valido: ${err}`);
+            }
+            else {
+                let newToken = createToken(payload);
+                console.log(newToken);
+                res.setHeader("authorization", newToken);
+                // Fa si che la header authorization venga restituita al client
+                res.setHeader("access-control-expose-headers", "authorization");
+                req["payload"] = payload;
+                next();
+            }
+        });
+    }
+});
+
+function createToken(data) {
+    let currentTimeSeconds = Math.floor(new Date().getTime() / 1000);
+    let payload = {
+        "_id": data._id,
+        "username": data.username,
+        // Se c'è iat mette iat altrimenti mette currentTimeSeconds
+        "iat": data.iat || currentTimeSeconds,
+        "exp": currentTimeSeconds + parseInt(process.env.TOKEN_EXPIRE_DURATION)
+    }
+    let token = _jwt.sign(payload, ENCRYPTION_KEY);
+    return token;
+}
+
+//********************************************************************************************//
+// Routes finali di risposta al client
+//********************************************************************************************//
+
+app.post("/api/dati", async (req, res, next) => {
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("dati");
+    let rq = collection.find({}).toArray();
+    rq.then((data) => {
+        if (!data) {
+            res.status(401).send("Not found");
+        }
+        else {
+            res.send(data);
+        }
+    });
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
+app.post("/api/domanda", async (req, res, next) => {
+    let domanda = req["body"].domanda;
+    console.log(domanda);
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+            {
+                "role": "system",
+                "content": "Sei un esperto in tutto l'ambito meteorologico, il calendario lunare e agricoltura quindi devi rispondere alle domande in modo super preciso. prendi come zona climatica di riferimento l'italia nord-occidentale ad un altitudine di 650 metri. nella risposta non ripetere la domanda."
+            },
+            {
+                "role": "user",
+                "content": domanda
+            }
+        ],
+        temperature: 1,
+        max_tokens: 80,
+        top_p: 1,
+    });
+
+    console.log(response);
+    res.send(response);
+});
+
+app.post("/api/prendiIrrigazioneAutomatica", async (req, res, next) => {
+    //prendiIrrigazioneAutomatica(res);
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("azioni");
+    let rq = collection.findOne({ "tipo": "gestioneAutomatico"});
+    rq.then((data) => {
+        res.send(data);
+    });
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
+async function prendiIrrigazioneAutomatica(res: any){
+    let risposta = {};
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("azioni");
+    let rq = collection.findOne({ "tipo": "gestioneAutomatico"});
+    rq.then((data) => {
+        risposta = { ...risposta, ...data };
+    });
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+    const newclient = new MongoClient(connectionString);
+    await newclient.connect();
+    let newcollection = newclient.db(DBNAME).collection("dati");
+    let newrq = newcollection.find({}).toArray();
+    newrq.then((data) => {
+        risposta = { ...risposta, ...data };
+       console.log(risposta);
+       res.send(risposta);
+    });
+    newrq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    newrq.finally(() => newclient.close());
+}
+
+app.post("/api/aggiornaIrrigazioneAutomatica", async (req, res, next) => {
+    let timer = req["body"].timer;
+    let selezionato = req["body"].selected;
+    let posizione = req["body"].posizione;  //posizione dell'elemento selezionato
+    console.log("selezzzz" + selezionato);
+    if (selezionato == true) {
+        const client = new MongoClient(connectionString);
+        await client.connect();
+        let collection = client.db(DBNAME).collection("azioni");
+        let rq = collection.updateMany({ "tipo": "gestioneAutomatico" }, { $set: { "disponibili.$[].selected": false } }); // Filtra l'array disponibili per trovare il secondo elemento non selezionato
+        rq.then((data) => { console.log(data) });
+        rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+        rq.finally(() => client.close());
+    }
+
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    let collection = client.db(DBNAME).collection("azioni");
+    let rq = collection.updateOne({ "tipo": "gestioneAutomatico" }, { $set: { [`disponibili.${posizione}.selected`]: selezionato } }); // Filtra l'array disponibili per trovare il secondo elemento non selezionato
+    rq.then((data) => {
+        res.send(data);
+    });
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
+    rq.finally(() => client.close());
+});
+
+app.post("/api/attivaDisattivaIrrigazione", async (req, res, next) => {
+    statoIrrigazione=req["body"].stato;
 });
 
 app.post("/api/prendidati", async (req, res, next) => {
@@ -197,6 +397,8 @@ app.post("/api/prendidati", async (req, res, next) => {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
     rq.finally(() => client.close());
 });
+
+
 
 app.post("/api/prendiazioni", async (req, res, next) => {
     const client = new MongoClient(connectionString);
@@ -241,6 +443,10 @@ app.post("/api/prendiAzioni", async (req, res, next) => {
     rq.finally(() => client.close());
 });
 
+app.post("/api/provaSocket", async (req, res, next) => {
+    res.send("ok");
+});
+
 async function aggiungoUmidita(hum: any, ora: any, res: any, date: any) {
     //mi collego al db
     const client = new MongoClient(connectionString);
@@ -277,9 +483,9 @@ async function eliminareDatiVecchi(data: import("mongodb").WithId<import("bson")
         const client = new MongoClient(connectionString);
         await client.connect();
         let collection = client.db(DBNAME).collection("dati");
-        let valori:never;
+        let valori: never;
         //aggiungo il dato
-        let rq = collection.updateMany({},{ $set: {valori: []} })
+        let rq = collection.updateMany({}, { $set: { valori: [] } })
         rq.then(async (data) => {
             console.log("cancellato");
         });
@@ -327,7 +533,33 @@ async function aggiungoDatiStorico(campo: any, res: any, req: any, tipo: any) {
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err}`));
 }
 
+//********************************************************************************************//
+// Gestione dei Web Socket
+//********************************************************************************************//
 
+// const io = new Server(server);
+// let users = [];
+// io.on('connection', function (clientSocket) {
+//     let user;
+//     clientSocket.on("JOIN-ROOM", function (data) {
+//         user = JSON.parse(data);
+//         console.log(`User ${user.username} isConnected! CLIENT SOCKET ID: ${clientSocket.id}`);
+//         users.push(user);
+//         // Inserisce il clientSocket nella room scelta dall'utente
+//         clientSocket.join(user.room);
+//         console.log(`${user.username} inserito correttamente nella stanza ${user.room}`);
+//         clientSocket.emit("JOIN-RESULT", "OK");
+//         clientSocket.emit("NEW-CLIENT-CONNECTED", `${user.username}`);
+//     });
+//     clientSocket.on("NEW-MESSAGE", (data) => {
+//         let message = { "from": user.username, "message": data, "date": new Date() }
+//         io.to(user.room).emit("MESSAGE-NOTIFY", JSON.stringify(message));
+//     });
+//     clientSocket.on("disconnect", () => {
+//         clientSocket.leave(user.room);
+//         users.splice(users.indexOf(user), 1);
+//     });
+// });
 
 //********************************************************************************************//
 // Default route e gestione degli errori
