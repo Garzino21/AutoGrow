@@ -62,3 +62,5 @@ SweetAlert: https://sweetalert.js.org/
 Chart.js: https://www.chartjs.org/
 
 Cloudinary: https://cloudinary.com/
+
+RIFERIMENTO AL PADLET DI PRESENTAZIONE IN SEDUTA ORALE DELL'ESAME DI STATO: https://padlet.com/dgarzino2248/autogrow-project-1u3p9pfhrq4hgd8h
