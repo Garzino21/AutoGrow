@@ -7,6 +7,57 @@ Auto Grow è un progetto innovativo nato con l'obiettivo di rendere l'arte della
 Auto Grow ottimizza l'uso delle risorse essenziali per la fotosintesi, come acqua e luce, rendendo l'irrigazione il più efficiente possibile. Il sistema è dotato di una serie di sensori che monitorano costantemente il terreno. In base ai dati raccolti, il sistema decide se e quanto irrigare. Dal sito web, è possibile monitorare lo stato del terreno e delle piante e modificare le impostazioni di irrigazione. Con semplici comandi, è possibile attivare o disattivare l'irrigazione automatica, passando alla modalità manuale.
 Auto Grow è progettato per essere estremamente facile da usare, consentendo a chiunque di godere dei benefici di avere un giardino in casa. Il design compatto permette di posizionarlo in qualsiasi ambiente, rendendolo ideale per ogni tipo di spazio.
 
+SPIEGAZIONE PARTI DEL SITO
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/f02dd244-835d-4be5-b735-f8d87f650e74)
+
+In questa immagine sono visualizzati i dati attuali relativi a una mini serra. Le informazioni sono organizzate in quattro riquadri:
+
+Temperatura: Il primo riquadro mostra la temperatura attuale all'interno della serra, che è di 22°C.
+Umidità dell'aria: Il secondo riquadro indica l'umidità relativa dell'aria nella serra, che è del 22%.
+Umidità del terreno (Hterra): Il terzo riquadro dovrebbe visualizzare l'umidità del terreno, ma invece di mostrare un valore specifico, mostra semplicemente "Hterra", suggerendo un possibile errore o mancanza di dati.
+Ora attuale: L'ultimo riquadro mostra l'ora corrente, che è 9:05:58.
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/5884d303-ff71-4778-a0ad-77c4278e14ee)
+
+Dati Visualizzati:
+Linea Blu (Temperatura): Mostra i valori della temperatura. In questo grafico, la temperatura è costante a circa 22°C in ogni punto di misurazione.
+Linea Rosa (Umidità): Sebbene sia indicata nella legenda, non sono presenti punti o linee rosa nel grafico, suggerendo che non ci sono dati disponibili o che l'umidità è rimasta costante a un valore non rappresentato nel grafico.
+Intervallo di Tempo:
+Il selettore in alto a destra è impostato su un intervallo di "10 min", il che significa che il grafico sta mostrando dati raccolti negli ultimi 10 minuti.
+L'asse del tempo (asse X) mostra le ore specifiche in cui le misurazioni sono state effettuate.
+
+![Screenshot 2024-05-24 091156](https://github.com/Garzino21/AutoGrow/assets/92369567/eadf13fc-a5be-44be-a790-0a7960976bc4)
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/4c27d080-8195-4989-9824-9be7fc5b72de)
+
+Irrigazione Manuale
+Descrizione: L'irrigazione manuale ti permette di controllare direttamente quando e quanto irrigare le piante. Questo può essere fatto utilizzando un annaffiatoio o attivando manualmente una valvola che rilascia l'acqua nel sistema di irrigazione della serra.
+Vantaggi: Ti consente di monitorare visivamente le condizioni delle piante e di adattare l'irrigazione in base alle necessità immediate.
+Irrigazione Automatica
+Descrizione: L'irrigazione automatica utilizza sensori e un sistema di controllo che regola automaticamente l'erogazione dell'acqua. I sensori monitorano l'umidità del terreno e, quando rilevano che l'umidità è sotto un certo livello, attivano il sistema di irrigazione per fornire l'acqua necessaria.
+Vantaggi: Questo metodo garantisce che le piante ricevano sempre l'acqua necessaria senza bisogno di intervento manuale costante. È particolarmente utile quando non sei presente per monitorare le piante o durante periodi di vacanza.
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/e7ba71ab-d460-4051-8263-1875e44f38ac)
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/48ae4b55-36b3-4836-9059-71f5c54b892b)
+
+Visualizzazione Settimanale: La sezione meteo mostra le previsioni del tempo per ciascun giorno della settimana in un formato chiaro e intuitivo. Ogni giorno della settimana è rappresentato con un'icona e una breve descrizione delle condizioni meteorologiche previste (ad esempio, soleggiato, pioggia, nuvoloso, ecc.).
+
+Interazione: Quando clicchi su uno dei giorni della settimana, viene visualizzata una finestra dettagliata che mostra il meteo specifico per il giorno selezionato.
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/cdd7a671-a55e-46e5-b933-a35db0cc23bb)
+
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/612bc092-8a55-4784-8934-fc140e3e8d88)
+
+Lato assistenza:
+Consigli per l'Agricoltura: La chat offre anche suggerimenti e consigli su vari aspetti dell'agricoltura, come l'irrigazione, la fertilizzazione, la gestione delle malattie delle piante e altro.
+
+Esempio di Domande:
+"Quanta acqua devo dare alle mie piante oggi?"
+"Qual è il miglior fertilizzante per le mie piante?"
+"Come posso prevenire le malattie comuni nelle mie colture?"
+
 HARDWARE UTILIZZATO
 
 Per il mio progetto, ho impiegato una selezione accurata di componenti hardware per garantire un funzionamento ottimale e affidabile:
