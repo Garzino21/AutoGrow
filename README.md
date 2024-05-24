@@ -58,6 +58,11 @@ Esempio di Domande:
 "Qual è il miglior fertilizzante per le mie piante?"
 "Come posso prevenire le malattie comuni nelle mie colture?"
 
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/09b8b8ea-4ccb-4a96-8cbc-a445a563974c)
+
+Infine ce una pagina dedicata alla presentazione del progetto
+
+
 HARDWARE UTILIZZATO
 
 Per il mio progetto, ho impiegato una selezione accurata di componenti hardware per garantire un funzionamento ottimale e affidabile:
