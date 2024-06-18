@@ -4,7 +4,7 @@
 BREVE DESCRIZIONE DEL PROGETTO E DEL FUNZIONAMENTO
 
 Auto Grow è un progetto innovativo nato con l'obiettivo di rendere l'arte della semina e della cura delle piante accessibile e semplice per tutti. Grazie ad Auto Grow, prendersi cura delle piante non sarà più un'attività noiosa, poiché il processo di irrigazione e cura del terreno è completamente automatizzato. Con Auto Grow, non vedrai l'ora di vedere crescere le tue piante!
-Auto Grow ottimizza l'uso delle risorse essenziali per la fotosintesi, come acqua e luce, rendendo l'irrigazione il più efficiente possibile. Il sistema è dotato di una serie di sensori che monitorano costantemente il terreno. In base ai dati raccolti, il sistema decide se e quanto irrigare. Dal sito web, è possibile monitorare lo stato del terreno e delle piante e modificare le impostazioni di irrigazione. Con semplici comandi, è possibile attivare o disattivare l'irrigazione automatica, passando alla modalità manuale.
+Auto Grow ottimizza l'uso dell' acqua, rendendo l'irrigazione il più efficiente possibile. Il sistema è dotato di una serie di sensori che monitorano costantemente il terreno. In base ai dati raccolti, il sistema decide se e quanto irrigare. Dal sito web, è possibile monitorare lo stato del terreno e modificare le impostazioni di irrigazione. Con semplici comandi, è possibile attivare o disattivare l'irrigazione automatica o passare alla modalità manuale.
 Auto Grow è progettato per essere estremamente facile da usare, consentendo a chiunque di godere dei benefici di avere un giardino in casa. Il design compatto permette di posizionarlo in qualsiasi ambiente, rendendolo ideale per ogni tipo di spazio.
 
 SPIEGAZIONE PARTI DEL SITO
@@ -13,16 +13,17 @@ SPIEGAZIONE PARTI DEL SITO
 
 In questa immagine sono visualizzati i dati attuali relativi a una mini serra. Le informazioni sono organizzate in quattro riquadri:
 
-Temperatura: Il primo riquadro mostra la temperatura attuale all'interno della serra, che è di 22°C.
-Umidità dell'aria: Il secondo riquadro indica l'umidità relativa dell'aria nella serra, che è del 22%.
-Umidità del terreno (Hterra): Il terzo riquadro dovrebbe visualizzare l'umidità del terreno, ma invece di mostrare un valore specifico, mostra semplicemente "Hterra", suggerendo un possibile errore o mancanza di dati.
-Ora attuale: L'ultimo riquadro mostra l'ora corrente, che è 9:05:58.
+Temperatura: Il primo riquadro mostra la temperatura attuale all'interno della serra.
+Umidità dell'aria: Il secondo riquadro indica l'umidità relativa dell'aria nella serra.
+Umidità del terreno (Hterra): Il terzo riquadro visualizza l'umidità del terreno.
+Ora attuale: L'ultimo riquadro mostra l'ora corrente.
 
 ![image](https://github.com/Garzino21/AutoGrow/assets/92369567/5884d303-ff71-4778-a0ad-77c4278e14ee)
 
 Dati Visualizzati:
-Linea Blu (Temperatura): Mostra i valori della temperatura. In questo grafico, la temperatura è costante a circa 22°C in ogni punto di misurazione.
-Linea Rosa (Umidità): Sebbene sia indicata nella legenda, non sono presenti punti o linee rosa nel grafico, suggerendo che non ci sono dati disponibili o che l'umidità è rimasta costante a un valore non rappresentato nel grafico.
+Linea Blu (Temperatura): Mostra i valori della temperatura nel tempo.
+Linea Rosa (Umidità): Mostra i valori dell'umidità dell'aria.
+
 Intervallo di Tempo:
 Il selettore in alto a destra è impostato su un intervallo di "10 min", il che significa che il grafico sta mostrando dati raccolti negli ultimi 10 minuti.
 L'asse del tempo (asse X) mostra le ore specifiche in cui le misurazioni sono state effettuate.
@@ -32,7 +33,7 @@ L'asse del tempo (asse X) mostra le ore specifiche in cui le misurazioni sono st
 ![image](https://github.com/Garzino21/AutoGrow/assets/92369567/4c27d080-8195-4989-9824-9be7fc5b72de)
 
 Irrigazione Manuale
-Descrizione: L'irrigazione manuale ti permette di controllare direttamente quando e quanto irrigare le piante. Questo può essere fatto utilizzando un annaffiatoio o attivando manualmente una valvola che rilascia l'acqua nel sistema di irrigazione della serra.
+Descrizione: L'irrigazione manuale ti permette di controllare direttamente quando e quanto irrigare le piante. Questo avviene grazie a una pompa alimentata a 1,5 volt.
 Vantaggi: Ti consente di monitorare visivamente le condizioni delle piante e di adattare l'irrigazione in base alle necessità immediate.
 Irrigazione Automatica
 Descrizione: L'irrigazione automatica utilizza sensori e un sistema di controllo che regola automaticamente l'erogazione dell'acqua. I sensori monitorano l'umidità del terreno e, quando rilevano che l'umidità è sotto un certo livello, attivano il sistema di irrigazione per fornire l'acqua necessaria.
@@ -67,11 +68,10 @@ HARDWARE UTILIZZATO
 
 Per il mio progetto, ho impiegato una selezione accurata di componenti hardware per garantire un funzionamento ottimale e affidabile:
 
-- Pompa a immersione da 3 volt: Essenziale per il sistema di irrigazione automatica, garantisce un flusso d'acqua costante e controllato.
+- Pompa a immersione da 3 volt alimentata a 1,5 volt: Essenziale per il sistema di irrigazione automatica, garantisce un flusso d'acqua costante e controllato.
 - Scheda Arduino: Il cuore del sistema, programmata per gestire e coordinare tutte le operazioni basate sui dati ricevuti dai sensori.
 - Cavi vari: Utilizzati per le connessioni interne, assicurano una trasmissione efficiente e sicura dei segnali tra i componenti.
 - Scheda di relè normalmente chiusi: Cruciale per il controllo della pompa, consente l'attivazione e la disattivazione automatica dell'irrigazione.
-- Galleggiante per rilevamento livello acqua: Monitora costantemente il livello dell'acqua, prevenendo il funzionamento a vuoto della pompa.
 - Sensore DHT11: Misura l'umidità e la temperatura dell'ambiente, fornendo dati vitali per ottimizzare le condizioni di crescita delle piante.
 - Batteria da 9 volt: Fornisce un'alimentazione stabile e duratura al sistema.
 - Sensore di umidità del terreno: Rileva l'umidità del suolo, permettendo alla scheda Arduino di decidere quando attivare la pompa per irrigare le piante.
@@ -84,6 +84,7 @@ Per il mio progetto, ho utilizzato i seguenti software, e tecnologie:
 - MongoDB: Scelto come sistema di gestione del database, permette un'archiviazione flessibile e performante dei dati.
 - API key per le chiamate a Chat GPT: Integrate per sfruttare le potenzialità dell'intelligenza artificiale nella gestione e nell'ottimizzazione delle operazioni del sistema.
 - API key per il meteo: Utilizzate per ottenere dati meteorologici aggiornati, contribuendo a rendere il sistema di irrigazione ancora più efficiente e reattivo alle condizioni ambientali.
+- API key per le notizie sull'agricoltura
 - JSON Web Token (JWT): Implementato per garantire la sicurezza e l'autenticazione degli utenti, assicurando un accesso sicuro alle funzionalità del sistema
 - SweetAlert: Utilizzato per creare avvisi modali accattivanti e user-friendly, migliorando l'interattività e l'esperienza utente.
 - Chart.js: Integrato per visualizzare i dati in modo dinamico e accattivante, attraverso grafici interattivi e personalizzabili.
