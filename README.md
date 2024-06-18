@@ -125,3 +125,5 @@ Chart.js: https://www.chartjs.org/
 Cloudinary: https://cloudinary.com/
 
 RIFERIMENTO AL PADLET DI PRESENTAZIONE: https://padlet.com/dgarzino2248/autogrow-project-1u3p9pfhrq4hgd8h
+
+RIFERIMENTO AL PROGETTO FUNZIONANTE E PUBBLICATO SU RENDER: https://autogrowweb.onrender.com
