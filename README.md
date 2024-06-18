@@ -59,6 +59,10 @@ Esempio di Domande:
 "Qual è il miglior fertilizzante per le mie piante?"
 "Come posso prevenire le malattie comuni nelle mie colture?"
 
+![image](https://github.com/Garzino21/AutoGrow/assets/92369567/f3c657d2-872e-4b2c-b3e3-7cf9940206fc)
+
+vi è una sezione inerente alle notizie dell'ultimo mese riguardanti l'agricoltura
+
 ![image](https://github.com/Garzino21/AutoGrow/assets/92369567/09b8b8ea-4ccb-4a96-8cbc-a445a563974c)
 
 Infine ce una pagina dedicata alla presentazione del progetto
